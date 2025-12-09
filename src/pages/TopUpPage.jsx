@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, Shield, Wallet, CreditCard } from 'lucide-react';
+import { Check, Shield, Wallet, CreditCard, Star } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import { games } from '../data/games';
 import './TopUpPage.css';
@@ -176,6 +176,34 @@ const TopUpPage = () => {
           </div>
 
         </div>
+
+        {/* User Reviews Section */}
+        <div className="reviews-section" style={{ marginTop: '60px' }}>
+          <h2 style={{ fontSize: '1.4rem', marginBottom: '20px' }}>User Reviews</h2>
+          <div className="glass-panel" style={{ padding: '20px' }}>
+             <div style={{ display: 'flex', gap: '20px', flexDirection: 'column' }}>
+                <div style={{ paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                      <span style={{ fontWeight: 'bold' }}>AlexGamer99</span>
+                      <div style={{ display: 'flex', color: '#FFD700' }}>
+                         {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="#FFD700" />)}
+                      </div>
+                   </div>
+                   <p style={{ color: '#aaa', fontSize: '0.9rem', margin: 0 }}>Instant delivery! Got my diamonds in less than 5 seconds.</p>
+                </div>
+                <div style={{ paddingBottom: '15px' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                      <span style={{ fontWeight: 'bold' }}>ProPlayerX</span>
+                      <div style={{ display: 'flex', color: '#FFD700' }}>
+                         {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="#FFD700" />)}
+                      </div>
+                   </div>
+                   <p style={{ color: '#aaa', fontSize: '0.9rem', margin: 0 }}>Best prices I&apos;ve found. Totally recommended.</p>
+                </div>
+             </div>
+          </div>
+        </div>
+
       </div>
     </MainLayout>
   );

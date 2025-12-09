@@ -7,6 +7,7 @@ import GamesPage from './pages/GamesPage';
 import NewsPage from './pages/NewsPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import NotFoundPage from './pages/NotFoundPage';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
 import './components/Hero3D.css'; // Import here or in component
@@ -24,6 +25,7 @@ function App() {
           <Route path="/topup/:gameId" element={<TopUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </AuthProvider>
