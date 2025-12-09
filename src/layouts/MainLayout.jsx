@@ -1,15 +1,13 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="main-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="main-layout">
       <Navbar />
-      <main className="content" style={{ flex: 1 }}>
+      <main className="content">
         {children}
       </main>
-      <Footer />
     </div>
   );
 };
