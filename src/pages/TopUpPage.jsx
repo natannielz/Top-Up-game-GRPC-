@@ -29,9 +29,27 @@ const TopUpPage = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const handlePay = () => {
-    if (!userId || !selectedDenom || !selectedPayment) return;
+    setError('');
+    if (!userId.trim()) {
+      setError('Please enter your User ID');
+      return;
+    }
+    if (userId.length < 3) {
+      setError('User ID must be at least 3 characters');
+      return;
+    }
+    if (!selectedDenom) {
+      setError('Please select a top-up amount');
+      return;
+    }
+    if (!selectedPayment) {
+      setError('Please select a payment method');
+      return;
+    }
+
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
@@ -92,6 +110,7 @@ const TopUpPage = () => {
               />
               <input type="text" placeholder="Server ID (Optional)" />
             </div>
+            {error && <div style={{ color: '#ef4444', marginBottom: '10px', fontSize: '0.9rem' }}>{error}</div>}
             <div className="validation-msg">
               <Shield size={14} /> Secure & Encrypted
             </div>
