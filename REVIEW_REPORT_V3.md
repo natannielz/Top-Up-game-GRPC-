@@ -26,3 +26,6 @@ We will focus on "Completeness" and "Trust":
 4.  **Enhance Top-Up Page:** Add a "User Reviews" section below the payment form.
 
 This will round out the application to look like a fully production-ready demo.
+
+## 4. Conflict Resolution Note
+Conflicts in `src/App.jsx` and `src/pages/NewsPage.jsx` have been resolved by preserving the new route structures and data extraction improvements.
