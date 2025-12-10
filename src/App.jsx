@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import GamesPage from './pages/GamesPage';
+import NewsPage from './pages/NewsPage';
 import TopUpPage from './pages/TopUpPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -13,6 +15,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/games" element={<GamesPage />} />
+          <Route path="/news" element={<NewsPage />} />
           <Route path="/topup/:gameId" element={<TopUpPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
