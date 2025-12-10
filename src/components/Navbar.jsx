@@ -27,6 +27,15 @@ const Navbar = () => {
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      navigate(`/games?q=${searchQuery}`);
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
@@ -44,7 +53,13 @@ const Navbar = () => {
         <div className="nav-actions">
           <div className="search-bar">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Find your game..." />
+            <input
+              type="text"
+              placeholder="Find your game..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+            />
           </div>
 
           <button

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import GameCard from '../components/GameCard';
 import { games } from '../data/games';
@@ -6,8 +7,16 @@ import { Search, Filter } from 'lucide-react';
 import './GamesPage.css';
 
 const GamesPage = () => {
+  const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  useEffect(() => {
+    const query = searchParams.get('q');
+    if (query) {
+      setSearchTerm(query);
+    }
+  }, [searchParams]);
 
   const categories = ['All', 'MOBA', 'FPS', 'RPG', 'Battle Royale', 'Strategy'];
 
