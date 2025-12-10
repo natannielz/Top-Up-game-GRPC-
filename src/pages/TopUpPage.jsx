@@ -29,11 +29,16 @@ const TopUpPage = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [trxId, setTrxId] = useState('');
 
   const handlePay = () => {
     if (!userId || !selectedDenom || !selectedPayment) return;
     setIsProcessing(true);
+
+    // Simulate API call
     setTimeout(() => {
+      const mockTrxId = 'TRX-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      setTrxId(mockTrxId);
       setIsProcessing(false);
       setShowSuccess(true);
     }, 2000);
@@ -51,6 +56,7 @@ const TopUpPage = () => {
             <div className="success-icon"><Check size={64} /></div>
             <h2>Payment Successful!</h2>
             <p>Your {selectedDenom.amount} diamonds have been added.</p>
+            <p className="trx-id">Transaction ID: {trxId}</p>
             <button className="primary-btn" onClick={() => setShowSuccess(false)}>Buy More</button>
           </motion.div>
         </div>
