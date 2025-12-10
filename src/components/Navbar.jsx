@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -9,12 +9,22 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
+  const navigate = useNavigate();
+
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const closeMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleProfileClick = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -39,7 +49,7 @@ const Navbar = () => {
 
           <button
             className="icon-btn profile-btn"
-            onClick={() => user ? window.location.href = '/dashboard' : window.location.href = '/login'}
+            onClick={handleProfileClick}
           >
             {user ? <img src={user.avatar} className="nav-avatar" alt="User" /> : <User size={20} />}
           </button>

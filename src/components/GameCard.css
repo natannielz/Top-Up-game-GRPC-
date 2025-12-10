@@ -1,31 +1,38 @@
 .game-card-wrapper {
   perspective: 1000px;
+  width: 100%;
 }
 
 .game-card {
   display: block;
-  text-decoration: none;
-  background: var(--bg-slate);
-  border-radius: 12px;
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-  position: relative;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  height: 100%;
 }
 
 .game-card:hover {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-  border-color: var(--accent-blue);
+  border-color: #8b5cf6;
+  box-shadow: 0 20px 25px -5px rgba(139, 92, 246, 0.15), 0 10px 10px -5px rgba(139, 92, 246, 0.1);
+  transform: translateY(-5px);
 }
 
 .card-image-container {
-  width: 100%;
-  aspect-ratio: 3/4;
-  overflow: hidden;
   position: relative;
+  width: 100%;
+  padding-top: 140%;
+  /* 5:7 Aspect Ratio */
+  overflow: hidden;
 }
 
 .card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -40,14 +47,15 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
 }
 
 .game-card:hover .card-overlay {
@@ -55,29 +63,49 @@
 }
 
 .play-button {
-  padding: 10px 24px;
-  background: var(--accent-blue);
-  color: #000;
-  font-weight: 700;
+  background: #8b5cf6;
+  color: white;
+  padding: 0.75rem 1.5rem;
   border-radius: 20px;
-  font-family: 'Orbitron', sans-serif;
-  box-shadow: 0 0 15px var(--accent-blue);
+  font-weight: 700;
+  letter-spacing: 1px;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.game-card:hover .play-button {
+  transform: translateY(0);
 }
 
 .card-info {
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 1.25rem;
+  background: linear-gradient(to bottom, rgba(30, 30, 30, 0.8), rgba(20, 20, 20, 0.95));
 }
 
 .card-info h3 {
-  margin: 0;
+  color: white;
+  margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
-  color: var(--text-main);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.card-info p {
-  margin: 4px 0 0;
+.card-info .publisher {
+  color: #9ca3af;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  margin: 0;
+}
+
+.price-tag {
+  margin-top: 0.75rem;
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 1rem;
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
 }

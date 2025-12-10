@@ -19,7 +19,10 @@ const GameCard = ({ game }) => {
         </div>
         <div className="card-info">
           <h3>{game.title}</h3>
-          <p>{game.publisher}</p>
+          <p className="publisher">{game.publisher}</p>
+          <div className="price-tag">
+            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(game.price)}
+          </div>
         </div>
       </Link>
     </motion.div>
