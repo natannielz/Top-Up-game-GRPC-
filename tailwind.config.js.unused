@@ -1,0 +1,47 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        cyber: {
+          black: '#0B0C15', // Deep Space Background
+          dark: '#151621',  // Surface / Cards
+          gray: '#2A2B38',  // Borders / Muted
+          cyan: '#00F0FF',  // Primary Accent
+          purple: '#BC13FE', // Secondary Accent
+          gold: '#FFD700',
+          white: '#FFFFFF',
+          muted: '#8F90A6',
+        },
+        // Semantic aliases
+        background: '#0B0C15',
+        surface: '#151621',
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        orbitron: ['Orbitron', 'sans-serif'],
+      },
+      boxShadow: {
+        'glow-cyan': '0 0 20px rgba(0, 240, 255, 0.4)',
+        'glow-purple': '0 0 20px rgba(188, 19, 254, 0.4)',
+        'cosmic': '0 0 50px rgba(0, 240, 255, 0.1)',
+        'start-warp': '0 0 100px rgba(255, 255, 255, 0.8)',
+      },
+      animation: {
+        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        }
+      }
+    },
+  },
+  plugins: [],
+}

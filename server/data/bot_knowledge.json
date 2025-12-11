@@ -1,0 +1,62 @@
+[
+  {
+    "keywords": [
+      "cara top up",
+      "topup",
+      "beli",
+      "isi saldo",
+      "how to buy"
+    ],
+    "answer": "✨ **Cara Top Up:**\n1. Pilih Game & Nominal\n2. Masukkan ID Player\n3. Pilih Pembayaran (QRIS/E-Wallet)\n4. Klik 'Bayar Sekarang'\n\nSaldo akan masuk otomatis 1-5 menit setelah pembayaran selesai."
+  },
+  {
+    "keywords": [
+      "pending",
+      "belum masuk",
+      "gagal",
+      "lama",
+      "stuck"
+    ],
+    "answer": "⚠️ **Status Pending:**\nSistem kami sedang memproses antrian. Jika lebih dari 10 menit, silakan ketik **'Cek TRX'** diikuti Nomor Transaksi Anda untuk pengecekan real-time."
+  },
+  {
+    "keywords": [
+      "batal",
+      "refund",
+      "kembalikan dana",
+      "uang kembali"
+    ],
+    "answer": "💸 **Kebijakan Refund:**\nRefund hanya diproses jika status transaksi 'FAILED' tapi saldo terpotong. Dana akan dikembalikan ke saldo akun dalam 1x24 jam."
+  },
+  {
+    "keywords": [
+      "redeem",
+      "kode",
+      "voucher",
+      "key",
+      "klaim"
+    ],
+    "answer": "🔑 **Cara Redeem Voucher:**\nMasuk ke halaman profil game Anda (di dalam game), pilih menu 'Redeem Code', dan masukkan kode yang Anda terima di email."
+  },
+  {
+    "keywords": [
+      "admin",
+      "cs",
+      "help",
+      "bantuan",
+      "orang"
+    ],
+    "answer": "📞 **Hubungi Admin:**\nSaya akan mencoba menghubungkan Anda dengan Admin manusia. Mohon tunggu sebentar..."
+  },
+  {
+    "keywords": [
+      "halo",
+      "hi",
+      "pagi",
+      "siang",
+      "sore",
+      "malam"
+    ],
+    "answer": "👋 **Halo Gamer!**\nSelamat datang di Command Center. Ada yang bisa saya bantu? Ketik kata kunci seperti 'Top Up', 'Gagal', atau 'Harga'."
+  }
+]

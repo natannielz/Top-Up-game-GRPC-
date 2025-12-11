@@ -1,5 +1,5 @@
+/* App.css cleared to prevent global padding issues */
 .app-container {
   width: 100%;
-  padding: 2rem;
-  box-sizing: border-box;
+  /* padding removed for full screen layouts */
 }

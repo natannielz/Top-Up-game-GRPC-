@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+/* eslint-disable react/no-unknown-property */
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
@@ -45,18 +46,10 @@ const HeroScene = () => {
 
 const Hero3D = () => {
   return (
-    <div className="hero-container">
-      <div className="hero-content">
-        <h1>LEVEL UP <span className="highlight">INSTANTLY</span></h1>
-        <p>Premium Top-Up Service for Professional Gamers</p>
-        <button className="cta-button">EXPLORE DEALS</button>
-      </div>
-
-      <div className="canvas-wrapper">
-        <Canvas camera={{ position: [0, 0, 5] }}>
-          <HeroScene />
-        </Canvas>
-      </div>
+    <div className="w-full h-[400px] lg:h-[500px] relative">
+      <Canvas camera={{ position: [0, 0, 5] }}>
+        <HeroScene />
+      </Canvas>
     </div>
   );
 };

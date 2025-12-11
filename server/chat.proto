@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package chat;
+
+service ChatService {
+  rpc JoinChat (User) returns (stream Message);
+  rpc SendMessage (Message) returns (Ack);
+  rpc ReceiveMessage (User) returns (stream Message);
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string role = 3; // "USER" or "ADMIN"
+}
+
+message Message {
+  string id = 1;
+  string sender_id = 2;
+  string sender_type = 3; // "USER", "ADMIN", "BOT"
+  string content = 4;
+  string timestamp = 5;
+  string receiver_id = 6; // Target user/admin ID for routing
+}
+
+message Ack {
+  bool success = 1;
+  string message = 2;
+}
