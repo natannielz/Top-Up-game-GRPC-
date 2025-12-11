@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import Home from './pages/Home';
 import GamesPage from './pages/GamesPage';
 import NewsPage from './pages/NewsPage';
-import TopUpPage from './pages/TopUpPage';
+import TransactionPage from './pages/TransactionPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -115,11 +115,12 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                    {/* Updated Route to point to TransactionPage */}
                     <Route
                       path="/topup/:gameId"
                       element={
                         <ProtectedRoute allowedRole="USER">
-                          <TopUpPage />
+                          <TransactionPage />
                         </ProtectedRoute>
                       }
                     />

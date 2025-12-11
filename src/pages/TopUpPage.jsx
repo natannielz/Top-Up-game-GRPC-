@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Shield, Wallet, CreditCard, QrCode, Smartphone, Loader2, AlertCircle, Sparkles, Copy, ArrowLeft, ChevronDown, ChevronUp, User } from 'lucide-react';
+import { Check, Wallet, Loader2, Sparkles, Copy, ArrowLeft, User, AlertCircle } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
 import { games } from '../data/games';
 import { Skeleton } from '../components/Skeleton';
+import PaymentSection from '../components/PaymentSection';
+import { processPayment, validateUser } from '../services/TransactionController';
 
-// Mock Data
+// Mock Data for Denominations
 const denominations = [
   { id: 1, amount: '5', price: 1500, bonus: '0' },
   { id: 2, amount: '10', price: 2850, bonus: '0' },
@@ -18,33 +20,6 @@ const denominations = [
   { id: 6, amount: '500', price: 142500, bonus: '50' },
   { id: 7, amount: '1000', price: 285000, bonus: '120' },
   { id: 8, amount: '2500', price: 712500, bonus: '300' },
-];
-
-const paymentCategories = [
-  {
-    id: 'ewallet',
-    title: 'E-Wallet',
-    methods: [
-      { id: 'gopay', name: 'GoPay', icon: Wallet, fee: '2%' },
-      { id: 'dana', name: 'DANA', icon: Smartphone, fee: '2%' },
-      { id: 'ovo', name: 'OVO', icon: Wallet, fee: '2%' },
-    ]
-  },
-  {
-    id: 'qris',
-    title: 'QRIS',
-    methods: [
-      { id: 'qris_all', name: 'QRIS All Payment', icon: QrCode, fee: '0.7%' },
-    ]
-  },
-  {
-    id: 'va',
-    title: 'Virtual Account',
-    methods: [
-      { id: 'bca_va', name: 'BCA Virtual Account', icon: CreditCard, fee: 'Rp 4000' },
-      { id: 'bri_va', name: 'BRI Virtual Account', icon: CreditCard, fee: 'Rp 4000' },
-    ]
-  },
 ];
 
 const TopUpPage = () => {
@@ -66,63 +41,73 @@ const TopUpPage = () => {
   const [isValidating, setIsValidating] = useState(false);
   const [selectedDenom, setSelectedDenom] = useState(null);
   const [selectedPayment, setSelectedPayment] = useState(null);
-  const [expandedPaymentCategory, setExpandedPaymentCategory] = useState('ewallet');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [trxId, setTrxId] = useState('');
   const [purchasedKey, setPurchasedKey] = useState(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 1000);
+    // Initial Load Simulation
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  const validateNick = useCallback(async () => {
-    if (isGameSale) return;
+  const handleValidateNick = useCallback(async () => {
+    if (isGameSale || !userId) return;
     setIsValidating(true);
-    // Simulate API Call
-    await new Promise(r => setTimeout(r, 1500));
+    setNickname('');
 
-    if (userId.includes("99")) {
+    try {
+      const result = await validateUser(userId, serverId);
+      setNickname(`✅ ${result.username}`);
+      info(`User found: ${result.username}`);
+    } catch (err) {
       setNickname("❌ User Not Found");
-      error("User ID not found!");
-    } else {
-      setNickname(`✅ ProGamer${userId.slice(-3)}`);
-      info("User found: ProGamer" + userId.slice(-3));
+      error(err.message);
+    } finally {
+      setIsValidating(false);
     }
-    setIsValidating(false);
-  }, [userId, isGameSale, error, info]);
+  }, [userId, serverId, isGameSale, error, info]);
 
-  // Removed auto-validation on typing to use the button instead as requested
-  // except maybe keeping it for UX but user specifically asked for "Check ID" button.
-  // I will keep the function but bind it to the button.
-
-  const handlePay = () => {
+  const handlePay = async () => {
+    // Validation
     if (isGameSale) {
-      if (!selectedPayment) return;
+      if (!selectedPayment) {
+        error("Please select a payment method.");
+        return;
+      }
     } else {
       if (!userId || !selectedDenom || !selectedPayment) {
         error("Please fill in all required fields!");
         return;
       }
-      if (userId.includes("99")) {
-        error("Invalid User ID");
+      if (nickname.includes('❌')) {
+        error("Invalid User ID. Please check again.");
         return;
       }
     }
 
     setIsProcessing(true);
 
-    setTimeout(() => {
-      const mockTrxId = 'TRX-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      setTrxId(mockTrxId);
+    const payload = {
+      userId: isGameSale ? 'guest' : userId,
+      gameId: game.id,
+      itemId: isGameSale ? 'standard-license' : selectedDenom.id,
+      paymentMethod: selectedPayment.id,
+      amount: isGameSale ? game.price : selectedDenom.price
+    };
+
+    try {
+      const result = await processPayment(payload);
+
+      // Handle Success
+      setTrxId(result.trxId);
 
       if (isGameSale) {
         const mockKey = game.licenseKeys ? game.licenseKeys[0] : 'XXXX-YYYY-ZZZZ-AAAA';
         setPurchasedKey(mockKey);
         addTransaction({
-          id: mockTrxId,
+          id: result.trxId,
           userId: 'guest',
           username: 'Guest User',
           game: game.title,
@@ -134,7 +119,7 @@ const TopUpPage = () => {
         });
       } else {
         addTransaction({
-          id: mockTrxId,
+          id: result.trxId,
           userId: userId,
           username: nickname.replace('✅ ', ''),
           game: game.title,
@@ -145,20 +130,20 @@ const TopUpPage = () => {
         });
       }
 
-      setIsProcessing(false);
       setShowSuccess(true);
       success("Transaction Successful!");
-    }, 2000);
+
+    } catch (err) {
+      error(err.message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const copyKey = () => {
     navigator.clipboard.writeText(purchasedKey);
     success("License key copied!");
   };
-
-  const togglePaymentCategory = (id) => {
-    setExpandedPaymentCategory(prev => prev === id ? null : id);
-  }
 
   if (!game && !isLoading) return <div className="text-white text-center pt-20">Game not found</div>;
 
@@ -326,7 +311,7 @@ const TopUpPage = () => {
                               placeholder="Zone ID"
                             />
                             <button
-                              onClick={validateNick}
+                              onClick={handleValidateNick}
                               disabled={isValidating || !userId}
                               className="bg-cyber-cyan/10 border border-cyber-cyan text-cyber-cyan px-4 rounded-xl font-bold hover:bg-cyber-cyan hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
@@ -409,64 +394,11 @@ const TopUpPage = () => {
                 </div>
               </section>
 
-              {/* STEP 3: PAYMENT */}
-              <section className="relative group">
-                <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-cyber-dark border border-pink-500/30 flex items-center justify-center text-xl font-bold font-orbitron text-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.2)] group-hover:scale-110 transition-transform relative z-10">3</div>
-                  <div className="flex-1 pt-2">
-                    <h3 className="text-2xl font-orbitron font-bold text-white mb-6">Payment</h3>
-
-                    <div className="space-y-4">
-                      {paymentCategories.map((category) => (
-                        <div key={category.id} className="border border-white/10 rounded-2xl overflow-hidden bg-white/5">
-                          <button
-                            onClick={() => togglePaymentCategory(category.id)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
-                          >
-                            <span className="font-bold text-white">{category.title}</span>
-                            {expandedPaymentCategory === category.id ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
-                          </button>
-
-                          <AnimatePresence>
-                            {expandedPaymentCategory === category.id && (
-                              <motion.div
-                                initial={{ height: 0 }}
-                                animate={{ height: "auto" }}
-                                exit={{ height: 0 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="p-4 pt-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                  {category.methods.map((method) => (
-                                    <div
-                                      key={method.id}
-                                      onClick={() => setSelectedPayment(method)}
-                                      className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
-                                                     ${selectedPayment?.id === method.id
-                                          ? 'bg-gradient-to-br from-blue-900/40 to-purple-900/40 border-blue-500 ring-1 ring-blue-500'
-                                          : 'bg-black/20 border-white/5 hover:border-white/20 hover:bg-black/40'
-                                        }
-                                                  `}
-                                    >
-                                      <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-                                        <method.icon size={20} className="text-black" />
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-bold text-white leading-tight">{method.name}</div>
-                                        <div className="text-[10px] text-gray-400 mt-0.5">Fee: {method.fee}</div>
-                                      </div>
-                                      {selectedPayment?.id === method.id && <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"></div>}
-                                    </div>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
+              {/* STEP 3: PAYMENT COMPONENTS */}
+              <PaymentSection
+                selectedPayment={selectedPayment}
+                onSelect={setSelectedPayment}
+              />
 
             </div>
 

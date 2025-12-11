@@ -100,8 +100,9 @@ app.get('/api/chat/join', (req, res) => {
 });
 
 // 3. Transaction API (Dual Pipeline)
-app.post('/api/transaction/pay', TransactionController.processTransaction);
-app.get('/api/transaction/history', TransactionController.getHistory);
+// 3. Transaction API
+app.post('/api/v1/transaction/create', TransactionController.createTransaction);
+// app.get('/api/transaction/history', TransactionController.getHistory); // Feature pending
 
 app.listen(PORT, () => {
   console.log(`[Gateway] HTTP Proxy running at http://localhost:${PORT}`);
