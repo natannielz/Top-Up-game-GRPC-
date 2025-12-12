@@ -18,6 +18,7 @@
     "@react-three/drei": "^9.105.0",
     "@react-three/fiber": "^8.16.0",
     "@tailwindcss/postcss": "^4.1.17",
+    "axios": "^1.13.2",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "express": "^5.2.1",

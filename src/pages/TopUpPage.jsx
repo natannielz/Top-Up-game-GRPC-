@@ -12,14 +12,14 @@ import { processPayment, validateUser } from '../services/TransactionController'
 
 // Mock Data for Denominations
 const denominations = [
-  { id: 1, amount: '5', price: 1500, bonus: '0' },
-  { id: 2, amount: '10', price: 2850, bonus: '0' },
-  { id: 3, amount: '50', price: 14250, bonus: '5' },
-  { id: 4, amount: '100', price: 28500, bonus: '10', popular: true },
-  { id: 5, amount: '250', price: 71250, bonus: '25' },
-  { id: 6, amount: '500', price: 142500, bonus: '50' },
-  { id: 7, amount: '1000', price: 285000, bonus: '120' },
-  { id: 8, amount: '2500', price: 712500, bonus: '300' },
+  { id: 'ML_5', amount: '5', price: 1500, bonus: '0' },
+  { id: 'ML_10', amount: '10', price: 2850, bonus: '0' },
+  { id: 'ML_50', amount: '50', price: 14250, bonus: '5' },
+  { id: 'ML_100', amount: '100', price: 28500, bonus: '10', popular: true },
+  { id: 'ML_250', amount: '250', price: 71250, bonus: '25' },
+  { id: 'ML_500', amount: '500', price: 142500, bonus: '50' },
+  { id: 'ML_1000', amount: '1000', price: 285000, bonus: '120' },
+  { id: 'ML_2500', amount: '2500', price: 712500, bonus: '300' },
 ];
 
 const TopUpPage = () => {
@@ -90,11 +90,13 @@ const TopUpPage = () => {
     setIsProcessing(true);
 
     const payload = {
-      userId: isGameSale ? 'guest' : userId,
+      userId: isGameSale ? 'guest' : userId, // This is Game ID in this context, will be mapped in service
+      serverId: serverId, // Add Zone ID
       gameId: game.id,
       itemId: isGameSale ? 'standard-license' : selectedDenom.id,
       paymentMethod: selectedPayment.id,
-      amount: isGameSale ? game.price : selectedDenom.price
+      amount: isGameSale ? game.price : selectedDenom.price,
+      productType: isGameSale ? 'GAME' : 'TOPUP'
     };
 
     try {

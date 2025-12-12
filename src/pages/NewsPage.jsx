@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import MainLayout from '../layouts/MainLayout';
 import { newsData } from '../data/newsData';
-import { ArrowLeft, Calendar, Clock, ChevronRight, Sparkles, Hash, TrendingUp, Zap, Newspaper, Share2, Eye } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, ChevronRight, Sparkles, Hash, TrendingUp, Zap, Newspaper, Share2, Eye, ArrowRight } from 'lucide-react';
 
 const NewsPage = () => {
   const [selectedArticle, setSelectedArticle] = useState(null);

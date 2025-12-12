@@ -49,25 +49,32 @@ export const ChatProvider = ({ children }) => {
       // Handle incoming message (e.g. from Bot or Admin)
       console.log("Context Received gRPC Msg:", msg);
 
-      // We need to know which session this belongs to. 
-      // For simplicity, we assume the current user's session or find it if Admin.
-      // If Sender is BOT/ADMIN -> It goes to the relevant User Session.
-      // Since we are Client-Side logic here, 'user.id' is the session key usually.
-
-      // const targetSessionId = "1"; // HARDCODED for Demo: "admin1" is ID 1 in AuthContext.
-      // In reality, msg should contain receiver_id.
-
-      // Update Session
       setSessions(prev => {
-        // Find session to update (assume user ID 1 for now if we don't have receiver info)
-        // If we are User, we update our own session.
-        // If we are Admin, we update the Sender's session.
-        const activeUserId = msg.sender_id === 'bot-001' ? (user?.id || 1) : msg.sender_id;
+        // DERIVE SESSION KEY
+        // 1. If I am an ADMIN, the key is the SENDER (the User ID).
+        // 2. If I am a USER, the key is MYSELF (my own User ID).
+        //    (Because different admins might reply, but they all appear in my one 'Support' chat).
 
-        // Fix: If I am User, Bot replies to Me.
-        const sessionKey = user?.role === 'ADMIN' ? msg.sender_id : user?.id;
+        let sessionKey;
+
+        if (user.role === 'ADMIN') {
+          // If message is from another Admin (unlikely in this flow) or System, handle gracefully
+          sessionKey = msg.sender_type === 'USER' ? msg.sender_id : 'system';
+        } else {
+          // I am a User. All messages (from Admin, Bot) go to my session state.
+          sessionKey = user.id;
+        }
 
         const current = prev[sessionKey] || { messages: [] };
+
+        // Prevent duplicate messages if optimistic update already added it (check by ID if possible, but IDs might differ)
+        // For now, checks if we just sent this (sender_id == user.id) are handled by optimistic update, 
+        // but this callback receives ALL messages from stream, so we should filter out our own messages if the server echoes them back.
+        // The server currently echoes to admins if User sends, and echoes to User if Admin sends.
+
+        // If I am the sender, ignore (Assumes optimistic update handled it)
+        if (String(msg.sender_id) === String(user.id)) return prev;
+
         return {
           ...prev,
           [sessionKey]: {
@@ -78,7 +85,9 @@ export const ChatProvider = ({ children }) => {
               text: msg.content,
               timestamp: msg.timestamp
             }],
-            unread: (current.unread || 0) + 1
+            unread: (current.unread || 0) + 1,
+            lastMessage: msg.content,
+            timestamp: msg.timestamp
           }
         };
       });
@@ -95,43 +104,6 @@ export const ChatProvider = ({ children }) => {
     };
   }, [user]); // Re-subscribe if user changes
 
-  // Bot Auto-Reply Logic
-  const handleBotReply = (userId, message) => {
-    setTimeout(() => {
-      let reply = "Hello! Admin is currently offline. How can I help you?";
-      const lowerMsg = message.toLowerCase();
-
-      if (lowerMsg.includes('top up') || lowerMsg.includes('buy')) {
-        reply = "To Top Up: Select a game -> Choose an item -> Enter ID -> Pay!";
-      } else if (lowerMsg.includes('status') || lowerMsg.includes('pending')) {
-        reply = "You can check your order status in the 'Transactions' menu.";
-      } else if (lowerMsg.includes('payment') || lowerMsg.includes('failed')) {
-        reply = "If your payment failed, please ensure your balance is sufficient or try another method.";
-      }
-
-      const botMsg = {
-        id: Date.now(),
-        sender: 'BOT',
-        text: reply,
-        timestamp: new Date().toISOString()
-      };
-
-      setSessions(prev => {
-        const userSession = prev[userId] || { messages: [] };
-        return {
-          ...prev,
-          [userId]: {
-            ...userSession,
-            messages: [...userSession.messages, botMsg],
-            lastMessage: botMsg.text,
-            timestamp: botMsg.timestamp,
-            unread: (userSession.unread || 0) + 1
-          }
-        };
-      });
-    }, 1500);
-  };
-
   const sendMessage = async (senderId, text, isAdmin = false, targetUserId = null) => {
     // 1. Optimistic Update (Show immediately)
     const tempId = Date.now();
@@ -145,7 +117,7 @@ export const ChatProvider = ({ children }) => {
     // Determine which session to update
     // If Admin sending to a specific user, update that user's session
     // If User sending, update their own session (their conversation)
-    const sessionId = isAdmin ? targetUserId || senderId : senderId;
+    const sessionId = isAdmin ? targetUserId : senderId;
 
     setSessions(prev => {
       const currentSession = prev[sessionId] || { messages: [], unread: 0 };
@@ -158,7 +130,7 @@ export const ChatProvider = ({ children }) => {
           timestamp: message.timestamp,
         }
       };
-    });
+    });  // Bot Auto-Reply Logic REMOVED (Server handles it)
 
     // 2. Send via gRPC
     try {
