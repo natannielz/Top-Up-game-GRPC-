@@ -7,6 +7,8 @@ import protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import * as TransactionController from './controllers/TransactionController.js';
+import * as NewsController from './controllers/NewsController.js';
+import * as GameDataController from './controllers/GameDataController.js';
 
 const app = express();
 const PORT = 3001;
@@ -99,10 +101,21 @@ app.get('/api/chat/join', (req, res) => {
   });
 });
 
-// 3. Transaction API (Dual Pipeline)
 // 3. Transaction API
 app.post('/api/v1/transaction/create', TransactionController.createTransaction);
-// app.get('/api/transaction/history', TransactionController.getHistory); // Feature pending
+
+// 4. News API
+app.get('/api/news', NewsController.getGameNews);
+
+// 5. Game Data API (The Intelligence Hub)
+app.get('/api/game/search', GameDataController.searchGames);
+app.get('/api/game/:id', GameDataController.getGameDetails);
+app.get('/api/game/:id/videos', GameDataController.getGameVideos);
+app.get('/api/game/:id/about', GameDataController.getGameDescription);
+app.get('/api/game/:id/tags', GameDataController.getGameTags);
+app.get('/api/game/:id/screenshots', GameDataController.getGameScreenshots);
+app.get('/api/game/:id/requirements', GameDataController.getGameRequirements);
+app.get('/api/game/:id/news', GameDataController.getGameNews);
 
 app.listen(PORT, () => {
   console.log(`[Gateway] HTTP Proxy running at http://localhost:${PORT}`);

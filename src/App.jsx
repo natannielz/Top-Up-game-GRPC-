@@ -6,6 +6,7 @@ import TransactionPage from './pages/TransactionPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import GameIntelligencePage from './pages/GameIntelligencePage';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DataProvider } from './context/DataContext';
@@ -71,7 +72,7 @@ function App() {
       <DataProvider>
         <ChatProvider>
           <ToastProvider>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <div className="app-container">
                 {loading && <LoadingScreen />}
                 <ConditionalNavbar />
@@ -131,6 +132,16 @@ function App() {
                           <DashboardPage />
                         </ProtectedRoute>
                       }
+                    />
+
+                    {/* Game Intelligence Hub */}
+                    <Route
+                      path="/game-intel"
+                      element={<GameIntelligencePage />}
+                    />
+                    <Route
+                      path="/game-intel/:id"
+                      element={<GameIntelligencePage />}
                     />
                   </Routes>
                 </Suspense>

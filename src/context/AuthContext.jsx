@@ -1,6 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { auth, googleProvider, facebookProvider } from '../config/firebase'; // Import Firebase
-import { signInWithPopup, signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -43,11 +41,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('users', JSON.stringify(seedUsers));
       }
 
-      // Check for active session
+      // Check for active session from LocalStorage
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
+
       setLoading(false);
     };
 
@@ -61,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [users]);
 
-  // --- MANUAL AUTH ---
+  // --- MANUAL AUTH (Keep for Admin/Mock) ---
   const login = (username, password) => {
     const foundUser = users.find(u => (u.username === username || u.email === username) && u.password === password);
     if (foundUser) {
@@ -97,71 +96,51 @@ export const AuthProvider = ({ children }) => {
     return newUser;
   };
 
-  // --- FIREBASE SOCIAL LOGIN ---
+  // --- MOCK SOCIAL LOGIN (Replaced Supabase) ---
   const loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const fbUser = result.user;
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Check if user exists in our local DB, if not, create one
-      let existingUser = users.find(u => u.email === fbUser.email);
+    // Mock successful Google Login
+    const mockGoogleUser = {
+      id: 'google-' + Date.now(),
+      username: 'Google User',
+      email: 'user@gmail.com',
+      role: 'USER',
+      status: 'Active',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=google',
+      points: 100,
+      rank: 'Bronze'
+    };
 
-      if (!existingUser) {
-        // Create new user from Social Data
-        const newUser = {
-          id: fbUser.uid,
-          username: fbUser.displayName || fbUser.email.split('@')[0],
-          email: fbUser.email,
-          role: 'USER',
-          status: 'Active', // Auto-approve social logins
-          avatar: fbUser.photoURL,
-          points: 100, // Bonus for social login
-          rank: 'Bronze'
-        };
-        setUsers(prev => [...prev, newUser]); // Update state
-        existingUser = newUser;
-      }
-
-      setUser(existingUser);
-      localStorage.setItem('currentUser', JSON.stringify(existingUser));
-      return existingUser;
-    } catch (error) {
-      console.error("Google Login Error:", error);
-      throw new Error(error.message);
-    }
+    setUser(mockGoogleUser);
+    localStorage.setItem('currentUser', JSON.stringify(mockGoogleUser));
+    return { user: mockGoogleUser };
   };
 
   const loginWithFacebook = async () => {
-    try {
-      const result = await signInWithPopup(auth, facebookProvider);
-      const fbUser = result.user;
-      // Similar logic to Google
-      let existingUser = users.find(u => u.email === fbUser.email);
-      if (!existingUser) {
-        const newUser = {
-          id: fbUser.uid,
-          username: fbUser.displayName || 'Facebook User',
-          email: fbUser.email,
-          role: 'USER',
-          status: 'Active',
-          avatar: fbUser.photoURL,
-          points: 100,
-          rank: 'Bronze'
-        };
-        setUsers(prev => [...prev, newUser]);
-        existingUser = newUser;
-      }
-      setUser(existingUser);
-      localStorage.setItem('currentUser', JSON.stringify(existingUser));
-      return existingUser;
-    } catch (error) {
-      console.error("Facebook Login Error:", error);
-      throw new Error(error.message);
-    }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Mock successful Facebook Login
+    const mockFBUser = {
+      id: 'fb-' + Date.now(),
+      username: 'Facebook User',
+      email: 'user@facebook.com',
+      role: 'USER',
+      status: 'Active',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=facebook',
+      points: 100,
+      rank: 'Bronze'
+    };
+
+    setUser(mockFBUser);
+    localStorage.setItem('currentUser', JSON.stringify(mockFBUser));
+    return { user: mockFBUser };
   };
 
   const logout = async () => {
-    await signOut(auth).catch(e => console.log("Firebase signout error (harmless if not fb user)", e));
+    // await supabase.auth.signOut(); // Removed
     setUser(null);
     localStorage.removeItem('currentUser');
   };

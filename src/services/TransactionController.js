@@ -1,4 +1,6 @@
 
+import { supabase } from '../lib/supabaseClient';
+
 export const processPayment = async (payload) => {
   console.log("Processing Payment Payload:", payload);
 
@@ -34,7 +36,31 @@ export const processPayment = async (payload) => {
       throw new Error(data.game_delivery.message || 'Top Up Failed at Provider');
     }
 
-    // 4. Map Backend Response to Frontend Expectation
+    // 4. Save to Supabase (Record Keeping)
+    const { error: sbError } = await supabase
+      .from('transactions')
+      .insert([
+        {
+          user_id: backendPayload.userId,
+          game_user_id: backendPayload.gameUserId,
+          game_zone_id: backendPayload.gameZoneId,
+          product_id: backendPayload.productId,
+          amount: backendPayload.amount,
+          payment_method: backendPayload.paymentMethod,
+          status: 'success', // Since we passed the checks above
+          // provider_sn: data.game_delivery?.sn // Optional: if you add this column later
+        }
+      ]);
+
+    if (sbError) {
+      console.error("Supabase Log Error:", sbError);
+      // We don't throw here strictly, because the transaction *did* happen.
+      // But we log it.
+    } else {
+      console.log("Transaction saved to Supabase successfully.");
+    }
+
+    // 5. Map Backend Response to Frontend Expectation
     return {
       status: 'success',
       trxId: data.transaction_id,

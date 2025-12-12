@@ -101,6 +101,7 @@ export const ChatProvider = ({ children }) => {
     // Cleanup on unmount or user change
     return () => {
       unsubscribe();
+      chatClient.disconnect();
     };
   }, [user]); // Re-subscribe if user changes
 
