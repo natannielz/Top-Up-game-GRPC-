@@ -1,0 +1,105 @@
+[
+  {
+    "id": "game-1",
+    "_id": "game-1",
+    "title": "Mobile Legends",
+    "description": "Top-up Diamonds for Mobile Legends: Bang Bang. Instant delivery.",
+    "genre": "MOBA",
+    "image": "https://placehold.co/400x600/101828/FFF?text=Mobile+Legends",
+    "gameType": "TOPUP",
+    "platform": "Mobile",
+    "status": "Active",
+    "topUpOptions": [
+      {
+        "label": "86 Diamonds",
+        "value": "86_diam",
+        "price": 20000
+      },
+      {
+        "label": "172 Diamonds",
+        "value": "172_diam",
+        "price": 40000
+      },
+      {
+        "label": "257 Diamonds",
+        "value": "257_diam",
+        "price": 60000
+      },
+      {
+        "label": "706 Diamonds",
+        "value": "706_diam",
+        "price": 160000
+      },
+      {
+        "label": "800 Diamonds",
+        "value": "800_diamond",
+        "price": 100000
+      },
+      {
+        "label": "1000 Diamonds",
+        "value": "1000_diamond",
+        "price": 180000
+      }
+    ],
+    "price": 0,
+    "updatedAt": "2025-12-25T11:31:59.554Z"
+  },
+  {
+    "id": "game-2",
+    "_id": "game-2",
+    "title": "PUBG Mobile",
+    "description": "Buy UC for PUBG Mobile securely and fast.",
+    "genre": "Battle Royale",
+    "image": "https://placehold.co/400x600/101828/FFF?text=PUBG+Mobile",
+    "gameType": "TOPUP",
+    "platform": "Mobile",
+    "status": "Active",
+    "topUpOptions": [
+      {
+        "label": "60 UC",
+        "value": "60_uc",
+        "price": 15000
+      },
+      {
+        "label": "325 UC",
+        "value": "325_uc",
+        "price": 75000
+      },
+      {
+        "label": "660 UC",
+        "value": "660_uc",
+        "price": 150000
+      }
+    ],
+    "price": 0,
+    "updatedAt": "2025-12-25T09:56:09.606Z"
+  },
+  {
+    "id": "game-3",
+    "_id": "game-3",
+    "title": "Valorant",
+    "description": "Get Valorant Points (VP) for skins and battle pass.",
+    "genre": "FPS",
+    "image": "https://placehold.co/400x600/101828/FFF?text=Valorant",
+    "gameType": "TOPUP",
+    "platform": "PC",
+    "status": "Active",
+    "topUpOptions": [
+      {
+        "label": "475 VP",
+        "value": "475_vp",
+        "price": 50000
+      },
+      {
+        "label": "1000 VP",
+        "value": "1000_vp",
+        "price": 100000
+      },
+      {
+        "label": "2050 VP",
+        "value": "2050_vp",
+        "price": 200000
+      }
+    ]
+  }
+]

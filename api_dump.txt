@@ -1,4 +1,0 @@
-ROOT KEYS: status, message, data
-ARRAY FOUND. Length: 7
-ITEM KEYS: news_title, date, content, like
-TITLE: Get Early Access to Claim the New Vapid FMJ MK V Supercar with GTA+

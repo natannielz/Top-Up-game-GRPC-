@@ -1,0 +1,17 @@
+import mongoose from 'mongoose';
+
+const newsSchema = mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  category: { type: String, default: 'General' }, // Update, Event, Esports
+  image: { type: String },
+  author: { type: String, default: 'Admin' },
+  isPublished: { type: Boolean, default: true }
+}, {
+  timestamps: true,
+  collection: 'news'
+});
+
+const News = mongoose.model('News', newsSchema);
+
+export default News;

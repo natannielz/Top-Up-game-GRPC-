@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" translate="no" class="notranslate">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google" content="notranslate" />
+  <title>GamerZone TopUp</title>
+  <!-- [PRESENTATION FIX] Aggressive Error Suppression for Clean Demo -->
+  <script>
+    (function () {
+      // Helper to check if a message matches our ignore list
+      function shouldSuppress(msg) {
+        var str = String(msg || '').toLowerCase();
+        return str.includes('<path>') ||
+          str.includes('attribute d') ||
+          str.includes('jquery') ||
+          str.includes('translate') ||
+          str.includes('extension');
+      }
+
+      // 1. Intercept console.error
+      var originalError = console.error;
+      console.error = function () {
+        var args = Array.prototype.slice.call(arguments);
+        var msg = args.map(function (arg) {
+          return (arg instanceof Error) ? arg.message : String(arg);
+        }).join(' ');
+
+        if (shouldSuppress(msg)) return;
+        originalError.apply(console, args);
+      };
+
+      // 2. Intercept global errors
+      window.onerror = function (msg, url, lineNo, columnNo, error) {
+        if (shouldSuppress(msg) || (error && shouldSuppress(error.message))) {
+          return true; // Prevents browser console log
+        }
+      };
+
+      // 3. Intercept promise rejections
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        var msg = (reason instanceof Error) ? reason.message : String(reason);
+        if (shouldSuppress(msg)) {
+          event.preventDefault(); // Prevents browser console log
+        }
+      });
+    })();
+  </script>
+</head>
+
+<body class="notranslate">
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
