@@ -2,9 +2,6 @@ import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import * as paymentController from './controllers/paymentController.js';
-import * as gameController from './controllers/gameController.js';
-import * as notificationController from './controllers/notificationController.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROTO_PATH = path.join(__dirname, 'chat.proto');
@@ -22,12 +19,6 @@ const chatProto = grpc.loadPackageDefinition(packageDefinition).chat;
 const users = new Map(); // userId -> call (stream)
 const admins = new Map(); // adminId -> call (stream)
 const adminStatus = 'ONLINE'; // 'ONLINE' | 'OFFLINE'
-
-console.log('[Server] Integration Controllers Loaded:', {
-  payment: !!paymentController,
-  game: !!gameController,
-  notif: !!notificationController
-});
 
 // Smart Bot Logic
 // Intelligent Bot Logic

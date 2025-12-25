@@ -1,738 +1,280 @@
-<![CDATA[<div align="center">
+# 📊 Laporan Teknologi Stack - GamerZone TopUp
 
-# 📋 LAPORAN TEKNIS LENGKAP
-## Proyek Website GamerZone TopUp
+## 📁 Ringkasan Proyek
 
----
-
-**Versi Dokumen:** 2.0  
-**Tanggal Penyusunan:** 25 Desember 2024  
-**Tim Pengembang:** GamerZone Development Team
-
-</div>
+| Aspek | Detail |
+|-------|--------|
+| **Nama Proyek** | GamerZone TopUp |
+| **Tipe** | Web Application (Full-Stack) |
+| **Arsitektur** | Microservices dengan API Gateway |
+| **Protokol** | REST API + gRPC |
 
 ---
 
-## 📑 Daftar Isi
+## 📖 Glosarium / Istilah Dasar
 
-| No | Bagian |
-|----|--------|
-| 1 | [Ringkasan Teknologi](#-1-ringkasan-teknologi-yang-digunakan) |
-| 2 | [Detail Stack Frontend](#-2-detail-stack-frontend) |
-| 3 | [Detail Stack Backend](#-3-detail-stack-backend) |
-| 4 | [Arsitektur Folder & Struktur Proyek](#-4-arsitektur-folder--struktur-proyek) |
-| 5 | [Logika Sisi Backend (Node.js/Express)](#-5-logika-sisi-backend-nodejsexpress) |
-| 6 | [Logika Sisi Frontend (React/Vite)](#-6-logika-sisi-frontend-reactvite) |
-| 7 | [Alur Integrasi End-to-End](#-7-alur-integrasi-end-to-end) |
-| 8 | [API Eksternal yang Digunakan](#-8-api-eksternal-yang-digunakan) |
-| 9 | [Kesimpulan](#-9-kesimpulan) |
+Berikut adalah tabel istilah teknis dasar yang digunakan dalam proyek ini untuk memudahkan pemahaman bagi developer atau pemangku kepentingan:
+
+| Istilah | Penjelasan Sederhana |
+|---------|-----------------------|
+| **Framework** | Kerangka kerja atau 'cetakan' yang mempercepat pembuatan aplikasi (cth: React, Express). |
+| **Backend** | Bagian aplikasi yang berjalan di server, mengelola database dan logika keamanan. |
+| **Frontend** | Bagian aplikasi yang dilihat langsung oleh user (Antarmuka/UI). |
+| **REST API** | Cara standar bagi aplikasi untuk 'berkomunikasi' menggunakan protokol HTTP (seperti membuka alamat web). |
+| **gRPC** | Teknologi Google untuk komunikasi antar server yang sangat cepat menggunakan pesan biner. |
+| **Database (NoSQL)** | Tempat penyimpanan data non-tabel (fleksibel), seperti MongoDB yang menyimpan data dalam format JSON. |
+| **ODM (Mongoose)** | Alat bantu di Node.js untuk memudahkan penulisan perintah ke database MongoDB. |
+| **SPA (Single Page App)** | Aplikasi web yang tidak perlu 'muat ulang' seluruh halaman saat pindah menu (sangat cepat). |
+| **Rendering (3D)** | Proses menghasilkan gambar visual dari model 3D menggunakan kode komputer (Three.js). |
+| **Protocol Buffers** | Format data yang dikompresi agar pengiriman pesan chat menjadi lebih ringan dan cepat. |
+| **Utility-First CSS** | Metode styling (desain) menggunakan kelas-kelas kecil siap pakai (Tailwind) daripada menulis CSS manual. |
+| **Middleware** | 'Satpam' perantara yang memeriksa keamanan atau data request sebelum sampai ke logika utama server. |
+| **CRUD** | Singkatan dari Create, Read, Update, Delete (proses dasar pengelolaan data). |
+| **Endpoint** | Alamat spesifik di server (URL) yang digunakan untuk mengambil atau mengirim data tertentu. |
+| **Sandbox / Mocking** | Lingkungan simulasi untuk mencoba fitur (seperti pembayaran) tanpa menggunakan data atau uang sungguhan. |
+| **Environment Variables** | Kunci rahasia atau pengaturan (seperti password database) yang disimpan di luar kode utama demi keamanan. |
 
 ---
 
-# 🛠 1. Ringkasan Teknologi yang Digunakan
+## 🖥️ Backend Stack
 
-## 1.1 Overview Tech Stack
+### Bahasa Pemrograman
+| Bahasa | Versi | Penggunaan |
+|--------|-------|------------|
+| **JavaScript (Node.js)** | ES2020+ (ES Modules) | Server-side logic, API endpoints, gRPC services |
+| **Protocol Buffers (proto3)** | v3 | Definisi kontrak gRPC services |
 
+### Framework & Runtime
+| Framework | Versi | Fungsi |
+|-----------|-------|--------|
+| **Express.js** | ^4.18.2 | REST API Gateway - routing HTTP requests |
+| **Node.js** | ES Modules | Runtime environment |
+
+### Database
+| Database | Versi | Fungsi |
+|----------|-------|--------|
+| **MongoDB** | via Mongoose ^8.0.0 | Primary database untuk games, transactions, users |
+| **MongoDB Memory Server** | ^11.0.1 | In-memory database untuk development/testing |
+
+### gRPC Stack
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **@grpc/grpc-js** | ^1.10.0 | gRPC client/server implementation untuk Node.js |
+| **@grpc/proto-loader** | ^0.7.10 | Dynamic proto file loader |
+| **google-protobuf** | ^3.21.2 | Protocol Buffers runtime library |
+
+### Utility Libraries
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **axios** | ^1.6.0 | HTTP client untuk external API calls |
+| **cors** | ^2.8.5 | Cross-Origin Resource Sharing middleware |
+| **dotenv** | ^16.4.0 | Environment variable management |
+| **body-parser** | ^1.20.2 | Parse incoming request bodies |
+| **firebase** | ^10.0.0 | Firebase integration (auth/storage) |
+| **fuse.js** | ^7.0.0 | Fuzzy search untuk smart bot responses |
+| **uuid** | ^9.0.1 | Generate unique identifiers |
+
+---
+
+## 🎨 Frontend Stack
+
+### Bahasa Pemrograman
+| Bahasa | Penggunaan |
+|--------|------------|
+| **JavaScript (ES6+)** | React components, business logic |
+| **JSX** | React component templates |
+| **CSS/PostCSS** | Styling dengan TailwindCSS |
+
+### Framework & Build Tools
+| Framework | Versi | Fungsi |
+|-----------|-------|--------|
+| **React** | ^18.2.0 | UI component library |
+| **React DOM** | ^18.2.0 | React rendering untuk browser |
+| **Vite** | ^5.2.0 | Build tool & development server |
+
+### UI & Styling
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **TailwindCSS** | ^3.4.1 | Utility-first CSS framework |
+| **PostCSS** | ^8.4.38 | CSS transformation |
+| **Autoprefixer** | ^10.4.19 | Add vendor prefixes automatically |
+| **Lucide React** | ^0.360.0 | Icon library |
+
+### Animation & 3D Graphics
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **Framer Motion** | ^11.0.0 | Animation library untuk React |
+| **Three.js** | ^0.160.0 | 3D graphics library |
+| **@react-three/fiber** | ^8.16.0 | React renderer untuk Three.js |
+| **@react-three/drei** | ^9.105.0 | Useful helpers untuk react-three-fiber |
+
+### Routing & State Management
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **React Router DOM** | ^6.20.0 | Client-side routing |
+| **React Query** | ^3.39.3 | Server state management & caching |
+
+### External Services
+| Library | Versi | Fungsi |
+|---------|-------|--------|
+| **@supabase/supabase-js** | ^2.39.0 | Supabase client (optional backend) |
+| **axios** | ^1.6.0 | HTTP client untuk API calls |
+| **React Player** | ^2.16.0 | Video/audio player component |
+
+### Development Tools
+| Tool | Versi | Fungsi |
+|------|-------|--------|
+| **ESLint** | ^8.57.0 | JavaScript linting |
+| **eslint-plugin-react** | ^7.34.1 | React-specific linting rules |
+| **eslint-plugin-react-hooks** | ^4.6.0 | React Hooks linting |
+| **@vitejs/plugin-react** | ^4.2.1 | React plugin untuk Vite |
+
+---
+
+## 🔌 API Architecture
+
+### REST API Endpoints (via Express Gateway)
 ```
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                         GAMERZONE TOPUP TECH STACK                            ║
-╠═══════════════════════════════════════════════════════════════════════════════╣
-║                                                                               ║
-║   ┌─────────────────────────────────────────────────────────────────────┐    ║
-║   │                        🎨 FRONTEND LAYER                            │    ║
-║   │                                                                     │    ║
-║   │   React 18  •  Vite 5  •  Tailwind CSS  •  Framer Motion          │    ║
-║   │   Three.js  •  React Router  •  Axios  •  Lucide Icons            │    ║
-║   │                                                                     │    ║
-║   └─────────────────────────────────────────────────────────────────────┘    ║
-║                                    ▼                                          ║
-║   ┌─────────────────────────────────────────────────────────────────────┐    ║
-║   │                        ⚙️ BACKEND LAYER                             │    ║
-║   │                                                                     │    ║
-║   │   Node.js  •  Express.js  •  gRPC  •  Mongoose                    │    ║
-║   │   Firebase  •  Fuse.js  •  UUID  •  Dotenv                        │    ║
-║   │                                                                     │    ║
-║   └─────────────────────────────────────────────────────────────────────┘    ║
-║                                    ▼                                          ║
-║   ┌─────────────────────────────────────────────────────────────────────┐    ║
-║   │                        💾 DATABASE LAYER                            │    ║
-║   │                                                                     │    ║
-║   │   MongoDB  •  MongoDB Memory Server (Fallback)  •  JSON Files     │    ║
-║   │                                                                     │    ║
-║   └─────────────────────────────────────────────────────────────────────┘    ║
-║                                                                               ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
+Frontend ──HTTP──> [gateway.js] ──gRPC──> [index.js] ──> MongoDB
 ```
 
-## 1.2 Statistik Proyek
+| Endpoint Pattern | Method | Fungsi |
+|-----------------|--------|--------|
+| `/api/games` | GET/POST | Game catalog CRUD |
+| `/api/games/:id` | GET/PUT/DELETE | Single game operations |
+| `/api/transactions` | GET/POST | Transaction management |
+| `/api/news` | GET | External news (GameSpot API) |
 
-| Metrik | Frontend | Backend | Total |
-|--------|----------|---------|-------|
-| **Dependencies** | 13 | 12 | **25** |
-| **Dev Dependencies** | 10 | 0 | **10** |
-| **Total Packages** | 23 | 12 | **35** |
-
----
-
-# 🎨 2. Detail Stack Frontend
-
-## 2.1 Core Libraries (Dependencies)
-
-### ⚛️ React Ecosystem
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **react** | ^18.2.0 | Library utama untuk membangun user interface berbasis komponen | Fondasi seluruh aplikasi frontend |
-| **react-dom** | ^18.2.0 | Package untuk merender React ke DOM browser | Mounting aplikasi ke `<div id="root">` |
-| **react-router-dom** | ^6.20.0 | Library routing untuk Single Page Application (SPA) | Navigasi antar halaman: Home, Games, TopUp, Admin, dll. |
-| **react-query** | ^3.39.3 | Library untuk data fetching, caching, dan state management server | Caching data API untuk performa optimal |
-
-### 🌐 HTTP & Data
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **axios** | ^1.6.0 | HTTP client berbasis Promise untuk browser dan Node.js | Komunikasi dengan backend API (`GET`, `POST`, `PUT`, `DELETE`) |
-| **@supabase/supabase-js** | ^2.39.0 | Client SDK untuk Supabase (Backend-as-a-Service) | Integrasi dengan layanan Supabase (opsional/alternative auth) |
-
-### 🎬 3D Graphics & Animation
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **three** | ^0.160.0 | Library JavaScript untuk membuat grafik 3D di browser | Render animasi 3D di halaman Hero |
-| **@react-three/fiber** | ^8.16.0 | React renderer untuk Three.js | Integrasi Three.js dengan komponen React |
-| **@react-three/drei** | ^9.105.0 | Kumpulan helper dan abstraksi untuk React Three Fiber | Mempermudah pembuatan scene 3D (lighting, controls, dll.) |
-| **framer-motion** | ^11.0.0 | Library animasi untuk React dengan API deklaratif | Animasi transisi halaman, hover effects, dan micro-interactions |
-
-### 🎥 Media & Utilities
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **react-player** | ^2.16.0 | Komponen React untuk memutar video dari berbagai sumber | Menampilkan video trailer game |
-| **lucide-react** | ^0.360.0 | Icon library modern berbasis React | Ikon UI di seluruh aplikasi (menu, tombol, status) |
-| **classnames** | ^2.5.1 | Utility untuk menggabungkan CSS class names secara kondisional | Dynamic styling berdasarkan state komponen |
-
-## 2.2 Development Tools (Dev Dependencies)
-
-### 🔧 Build & Bundle
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **vite** | ^5.2.0 | Build tool generasi baru dengan Hot Module Replacement (HMR) super cepat | Development server & production bundling |
-| **@vitejs/plugin-react** | ^4.2.1 | Plugin Vite untuk dukungan React (Fast Refresh) | Integrasi React dengan Vite |
-
-### 🎨 Styling
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **tailwindcss** | ^3.4.1 | Utility-first CSS framework | Styling seluruh komponen UI |
-| **postcss** | ^8.4.38 | Tool untuk transformasi CSS dengan JavaScript plugins | Processing Tailwind CSS |
-| **autoprefixer** | ^10.4.19 | PostCSS plugin untuk menambahkan vendor prefixes secara otomatis | Kompatibilitas cross-browser |
-
-### 🔍 Code Quality
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **eslint** | ^8.57.0 | Linter JavaScript untuk menemukan dan memperbaiki masalah kode | Menjaga kualitas dan konsistensi kode |
-| **eslint-plugin-react** | ^7.34.1 | Plugin ESLint khusus untuk React | Rules spesifik untuk komponen React |
-| **eslint-plugin-react-hooks** | ^4.6.0 | Plugin ESLint untuk memvalidasi React Hooks | Memastikan penggunaan hooks yang benar |
-| **eslint-plugin-react-refresh** | ^0.4.6 | Plugin ESLint untuk React Refresh/Fast Refresh | Kompatibilitas dengan Vite |
-
-### 📦 Type Definitions
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **@types/react** | ^18.2.66 | TypeScript definitions untuk React | IntelliSense dan autocomplete di IDE |
-| **@types/react-dom** | ^18.2.22 | TypeScript definitions untuk React DOM | IntelliSense untuk ReactDOM API |
-
-## 2.3 Konfigurasi Tailwind CSS
-
-```javascript
-// tailwind.config.js
-{
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    extend: {
-      colors: {
-        // 🎨 PALET WARNA CYBERPUNK
-        'cyber-black': '#0B0C15',    // Background utama
-        'cyber-dark': '#12131E',     // Background sekunder
-        'cyber-gray': '#1A1B2E',     // Card background
-        'cyber-slate': '#252640',    // Border & divider
-        'cyber-cyan': '#00FFFF',     // Accent primary
-        'cyber-blue': '#00BFFF',     // Accent secondary
-        'cyber-purple': '#BC13FE',   // Highlight
-        'cyber-magenta': '#FF00FF',  // Gradient accent
-        'cyber-violet': '#8B5CF6',   // Button hover
-        'cyber-gold': '#FFD700',     // Premium/VIP
-        'cyber-green': '#00FF88',    // Success status
-        'cyber-white': '#FFFFFF',    // Text primary
-        'cyber-muted': '#8F90A6',    // Text secondary
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],     // Body text
-        orbitron: ['Orbitron', 'sans-serif'],           // Heading futuristik
-      },
-    },
-  },
+### gRPC Services (chat.proto)
+```protobuf
+service ChatService {
+  rpc JoinChat (User) returns (stream Message);      // Streaming - join chat room
+  rpc SendMessage (Message) returns (Ack);           // Unary - send single message
+  rpc ReceiveMessage (User) returns (stream Message); // Streaming - receive messages
 }
 ```
 
----
+| Service Method | Type | Fungsi |
+|---------------|------|--------|
+| **JoinChat** | Server Streaming | User/Admin joins chat, receives real-time messages |
+| **SendMessage** | Unary RPC | Send message, get acknowledgment |
+| **ReceiveMessage** | Server Streaming | Subscribe to incoming messages |
 
-# ⚙ 3. Detail Stack Backend
-
-## 3.1 Core Libraries (Dependencies)
-
-### 🖥 Server Framework
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **express** | ^4.18.2 | Framework web minimalis dan fleksibel untuk Node.js | HTTP API server pada port 3002 |
-| **body-parser** | ^1.20.2 | Middleware untuk parsing request body | Parsing JSON data dari request POST/PUT |
-| **cors** | ^2.8.5 | Middleware untuk mengaktifkan Cross-Origin Resource Sharing | Mengizinkan request dari frontend (localhost:5173) |
-| **dotenv** | ^16.4.0 | Memuat environment variables dari file `.env` | Konfigurasi API keys dan koneksi database |
-
-### 💾 Database
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **mongoose** | ^8.0.0 | ODM (Object Document Mapper) untuk MongoDB | Definisi skema dan operasi database untuk Game, User, News |
-| **mongodb-memory-server** | ^11.0.1 | In-memory MongoDB server untuk development/testing | Fallback otomatis jika MongoDB lokal tidak tersedia |
-
-### 📡 Real-time Communication (gRPC)
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **@grpc/grpc-js** | ^1.10.0 | Implementasi gRPC pure JavaScript | Server gRPC untuk fitur Chat real-time (port 50051) |
-| **@grpc/proto-loader** | ^0.7.10 | Loader untuk file Protocol Buffer (.proto) | Load definisi service dari `chat.proto` |
-| **google-protobuf** | ^3.21.2 | Library Protocol Buffers untuk serialisasi data | Serialisasi message chat |
-
-### 🔌 External Services & Utilities
-
-| Library | Versi | Deskripsi | Penggunaan dalam Proyek |
-|---------|-------|-----------|-------------------------|
-| **firebase** | ^10.0.0 | SDK Firebase untuk autentikasi dan layanan lainnya | Integrasi Firebase (authentication, optional) |
-| **axios** | ^1.6.0 | HTTP client untuk melakukan request ke API eksternal | Fetch berita dari GameSpot API |
-| **fuse.js** | ^7.0.0 | Library fuzzy-search yang ringan | Fitur pencarian game dengan toleransi typo |
-| **uuid** | ^9.0.1 | Generator UUID (Universally Unique Identifier) | Generate ID unik untuk transaksi dan entitas lainnya |
-
-## 3.2 Arsitektur Server
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           BACKEND ARCHITECTURE                              │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   server.js (Orchestrator)                                                 │
-│   ┌──────────────────────────────────────────────────────────────────┐    │
-│   │                                                                  │    │
-│   │   ┌─────────────────┐           ┌─────────────────┐             │    │
-│   │   │   gateway.js    │           │    index.js     │             │    │
-│   │   │   (Express)     │           │    (gRPC)       │             │    │
-│   │   │                 │           │                 │             │    │
-│   │   │   Port: 3002    │           │   Port: 50051   │             │    │
-│   │   │                 │           │                 │             │    │
-│   │   │   • REST API    │           │   • Chat        │             │    │
-│   │   │   • Admin CRUD  │           │   • Real-time   │             │    │
-│   │   │   • Transaksi   │           │   • Streaming   │             │    │
-│   │   │                 │           │                 │             │    │
-│   │   └────────┬────────┘           └────────┬────────┘             │    │
-│   │            │                             │                       │    │
-│   │            ▼                             ▼                       │    │
-│   │   ┌─────────────────────────────────────────────────────┐       │    │
-│   │   │              config/db.js                           │       │    │
-│   │   │                                                     │       │    │
-│   │   │   MongoDB ─────▶ Fallback ─────▶ In-Memory Server  │       │    │
-│   │   │                                                     │       │    │
-│   │   └─────────────────────────────────────────────────────┘       │    │
-│   │                                                                  │    │
-│   └──────────────────────────────────────────────────────────────────┘    │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+### gRPC Message Types
+| Message | Fields | Penggunaan |
+|---------|--------|------------|
+| **User** | `id`, `username`, `role` | Identify USER or ADMIN |
+| **Message** | `id`, `sender_id`, `sender_type`, `content`, `timestamp`, `receiver_id` | Chat message payload |
+| **Ack** | `success`, `message` | Response acknowledgment |
 
 ---
 
-# 🏗 4. Arsitektur Folder & Struktur Proyek
+## 🤖 Smart Bot System
 
-## 4.1 Struktur Direktori Lengkap
-
-```
-📦 all code/
-│
-├── 📂 backend/                          # SERVER-SIDE
-│   │
-│   ├── 📂 config/
-│   │   └── 📄 db.js                     # Koneksi MongoDB + fallback logic
-│   │
-│   ├── 📂 controllers/
-│   │   ├── 📄 GamesController.js        # Katalog game publik (GameSpot)
-│   │   ├── 📄 LocalGamesController.js   # CRUD Game & Transaksi lokal
-│   │   ├── 📄 NewsController.js         # Fetch berita dari API eksternal
-│   │   ├── 📄 SystemController.js       # Status sistem
-│   │   ├── 📄 TransactionController.js  # Logika transaksi
-│   │   └── 📄 ... (lainnya)
-│   │
-│   ├── 📂 data/
-│   │   ├── 📄 games.json                # Penyimpanan game (JSON fallback)
-│   │   └── 📄 transactions.json         # Penyimpanan transaksi (JSON fallback)
-│   │
-│   ├── 📂 models/
-│   │   ├── 📄 Game.js                   # Skema Mongoose: Game/TopUp
-│   │   ├── 📄 News.js                   # Skema Mongoose: Berita
-│   │   └── 📄 User.js                   # Skema Mongoose: User
-│   │
-│   ├── 📄 chat.proto                    # Protocol Buffer definition untuk gRPC
-│   ├── 📄 gateway.js                    # Express HTTP Server (Port 3002)
-│   ├── 📄 index.js                      # gRPC Server (Port 50051)
-│   ├── 📄 server.js                     # Entry point & orchestrator
-│   ├── 📄 package.json                  # Dependencies backend
-│   └── 📄 .env                          # Environment variables
-│
-└── 📂 frontend/                         # CLIENT-SIDE
-    │
-    ├── 📂 src/
-    │   │
-    │   ├── 📂 components/               # Komponen UI Reusable
-    │   │   ├── 📄 Navbar.jsx            # Navigation bar
-    │   │   ├── 📄 Footer.jsx            # Footer website
-    │   │   ├── 📄 GameCard.jsx          # Card produk game
-    │   │   ├── 📄 ChatWidget.jsx        # Widget chat floating
-    │   │   ├── 📄 PaymentSection.jsx    # Form pembayaran
-    │   │   ├── 📄 Hero3D.jsx            # Hero section dengan 3D
-    │   │   ├── 📄 StarField.jsx         # Background animasi bintang
-    │   │   ├── 📄 LoadingScreen.jsx     # Loading screen
-    │   │   └── 📄 ... (20+ komponen)
-    │   │
-    │   ├── 📂 context/                  # State Management (React Context)
-    │   │   ├── 📄 DataContext.jsx       # ⭐ Single Source of Truth
-    │   │   ├── 📄 AuthContext.jsx       # Autentikasi user
-    │   │   ├── 📄 ChatContext.jsx       # State chat real-time
-    │   │   └── 📄 ToastContext.jsx      # Notifikasi toast
-    │   │
-    │   ├── 📂 pages/                    # Halaman Aplikasi
-    │   │   ├── 📄 Home.jsx              # Halaman beranda
-    │   │   ├── 📄 GamesPage.jsx         # Katalog game
-    │   │   ├── 📄 GameDetailsPage.jsx   # Detail produk
-    │   │   ├── 📄 TopUpPage.jsx         # ⭐ Halaman top-up
-    │   │   ├── 📄 SuccessPage.jsx       # Konfirmasi sukses
-    │   │   ├── 📄 NewsPage.jsx          # Berita gaming
-    │   │   ├── 📄 LoginPage.jsx         # Login user/admin
-    │   │   ├── 📄 AdminDashboardPage.jsx# ⭐ Dashboard admin
-    │   │   └── 📄 TransactionPage.jsx   # Riwayat transaksi
-    │   │
-    │   ├── 📄 App.jsx                   # Root component & routing
-    │   ├── 📄 main.jsx                  # Entry point React
-    │   └── 📄 index.css                 # Global styles + Tailwind
-    │
-    ├── 📄 index.html                    # HTML template
-    ├── 📄 vite.config.js                # Konfigurasi Vite
-    ├── 📄 tailwind.config.js            # Konfigurasi Tailwind CSS
-    ├── 📄 postcss.config.js             # Konfigurasi PostCSS
-    ├── 📄 package.json                  # Dependencies frontend
-    └── 📄 .env                          # Environment variables (VITE_API_URL)
-```
-
----
-
-# ⚙ 5. Logika Sisi Backend (Node.js/Express)
-
-## 5.1 Daftar Lengkap API Endpoints
-
-### 📌 Game Management (Admin)
-
-| Method | Endpoint | Controller | Deskripsi |
-|--------|----------|------------|-----------|
-| `GET` | `/api/admin/games` | `LocalGamesController.getLocalGames` | Ambil semua game |
-| `POST` | `/api/admin/games` | `LocalGamesController.createGame` | Tambah game baru |
-| `PUT` | `/api/admin/games/:id` | `LocalGamesController.updateGame` | Update game |
-| `DELETE` | `/api/admin/games/:id` | `LocalGamesController.deleteGame` | Hapus game |
-
-### 📌 Transaction Management
-
-| Method | Endpoint | Controller | Deskripsi |
-|--------|----------|------------|-----------|
-| `GET` | `/api/admin/transactions` | `LocalGamesController.getTransactions` | Ambil semua transaksi |
-| `POST` | `/api/v1/transaction/create` | `LocalGamesController.createTransaction` | Buat transaksi baru |
-| `PUT` | `/api/admin/transactions/:id/status` | `LocalGamesController.updateTransactionStatus` | Update status |
-
-### 📌 Public APIs
-
-| Method | Endpoint | Controller | Deskripsi |
-|--------|----------|------------|-----------|
-| `GET` | `/api/catalog` | `GamesController.getGamesByGenre` | Katalog game publik |
-| `GET` | `/api/catalog/game/:id` | `GamesController.getGameById` | Detail game |
-| `GET` | `/api/news` | `NewsController.getGameNews` | Berita dari GameSpot |
-| `GET` | `/api/admin/status` | `SystemController.getSystemStatus` | Status sistem |
-| `GET` | `/api/ping` | (inline) | Health check |
-
-### 📌 Chat (gRPC via HTTP Gateway)
-
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| `POST` | `/api/chat/send` | Kirim pesan chat |
-| `GET` | `/api/chat/join` | Join chat room (SSE stream) |
-
-## 5.2 Skema Database Detail
-
-### 📦 Game Schema
-
-```javascript
-const gameSchema = new mongoose.Schema({
-  // INFORMASI DASAR
-  title:       { type: String, required: true },
-  description: { type: String, required: true },
-  genre:       { type: String, required: true },
-  image:       { type: String, required: true },
-  platform:    { type: String, default: 'PC' },
-  
-  // TIPE & HARGA
-  gameType: {
-    type: String,
-    enum: ['GAME', 'TOPUP'],
-    default: 'TOPUP',
-    required: true
-  },
-  price: { type: Number, default: 0 },
-  
-  // OPSI TOP-UP
-  topUpOptions: [{
-    label: { type: String, required: true },  // "100 Diamonds"
-    value: { type: String, required: true },  // "100_diam"
-    price: { type: Number, required: true }   // 15000
-  }],
-  
-  // STATUS
-  status: { type: String, default: 'Active' },
-  originalId: { type: String }
-}, { timestamps: true });
-```
-
-### 📦 Transaction Schema (Implicit)
-
-```javascript
-const transactionSchema = {
-  id:            String,    // "TRX-1703512345678"
-  userId:        String,    // "user123" atau "guest"
-  username:      String,    // "JohnDoe"
-  avatar:        String,    // DiceBear URL
-  game:          String,    // "Mobile Legends"
-  gameType:      String,    // "TOPUP"
-  item:          String,    // "100 Diamonds"
-  amount:        Number,    // 15000
-  status:        String,    // "Success"
-  date:          String,    // "2024-12-25"
-  timestamp:     String,    // ISO format
-  paymentMethod: String     // "DANA"
-};
-```
-
----
-
-# 🎨 6. Logika Sisi Frontend (React/Vite)
-
-## 6.1 State Management: DataContext.jsx
-
-```javascript
-// DataContext.jsx - Single Source of Truth
-
-const DataContext = createContext(null);
-
-export const DataProvider = ({ children }) => {
-  // ═══════════════════════════════════════
-  // STATE
-  // ═══════════════════════════════════════
-  const [games, setGames] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-
-  // ═══════════════════════════════════════
-  // ACTIONS
-  // ═══════════════════════════════════════
-  const addGame = async (newGame) => { ... };
-  const updateGame = async (id, data) => { ... };
-  const deleteGame = async (id) => { ... };
-  const addTransaction = async (trx) => { ... };
-  const updateTransactionStatus = async (id, status) => { ... };
-  
-  // ═══════════════════════════════════════
-  // UTILITIES
-  // ═══════════════════════════════════════
-  const getStats = () => {
-    const totalIncome = transactions
-      .filter(t => t.status === 'Success')
-      .reduce((sum, t) => sum + t.amount, 0);
-    return { totalIncome, totalTransactions: transactions.length };
-  };
-  
-  const generateAvatar = (username) => {
-    return `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(username)}`;
-  };
-
-  return (
-    <DataContext.Provider value={{
-      games, addGame, updateGame, deleteGame,
-      transactions, addTransaction, updateTransactionStatus,
-      getStats, generateAvatar
-    }}>
-      {children}
-    </DataContext.Provider>
-  );
-};
-```
-
-## 6.2 Fitur-Fitur Utama
-
-| Fitur | File | Deskripsi |
-|-------|------|-----------|
-| **Pemilihan Nominal** | `TopUpPage.jsx` | Radio button dinamis dari `topUpOptions` |
-| **Simulasi Pembayaran** | `TopUpPage.jsx` | Validasi → Create Transaction → Redirect Success |
-| **Avatar Otomatis** | `DataContext.jsx` | DiceBear API dengan seed username |
-| **Admin Dashboard** | `AdminDashboardPage.jsx` | CRUD produk + monitor transaksi |
-| **Real-time Stats** | `LiveStats.jsx` | Total pendapatan & jumlah transaksi |
-| **Chat Widget** | `ChatWidget.jsx` | gRPC streaming via SSE |
-
----
-
-# 🔄 7. Alur Integrasi End-to-End
-
-## 7.1 Diagram Alur Pembelian
+Bot menggunakan **Fuse.js** untuk fuzzy search pada knowledge base:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        ALUR PEMBELIAN END-TO-END                            │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   👤 USER                   🖥️ FRONTEND                ⚙️ BACKEND          │
-│                                                                             │
-│   [1] Pilih Game ─────────▶ TopUpPage.jsx                                  │
-│                                   │                                         │
-│   [2] Pilih Nominal ──────▶ selectedDenom state                            │
-│                                   │                                         │
-│   [3] Isi User ID ────────▶ userId state                                   │
-│                                   │                                         │
-│   [4] Pilih Payment ──────▶ paymentMethod state                            │
-│                                   │                                         │
-│   [5] Klik BAYAR ─────────▶ handlePay()                                    │
-│                                   │                                         │
-│                                   ▼                                         │
-│                            DataContext                                      │
-│                            addTransaction()                                 │
-│                                   │                                         │
-│                                   ▼                                         │
-│                            POST /api/v1/ ────────────▶ LocalGamesController │
-│                            transaction/create                  │            │
-│                                   │                            ▼            │
-│                                   │                     writeData()         │
-│                                   │                            │            │
-│                                   │                            ▼            │
-│                                   │               💾 transactions.json      │
-│                                   │                            │            │
-│                                   ◀────────────────────────────┘            │
-│                                   │                                         │
-│   [6] Redirect ◀──────────▶ /success                                       │
-│                                                                             │
-│   ════════════════════════════════════════════════════════════════════     │
-│                                                                             │
-│   👨‍💼 ADMIN                                                                 │
-│                                                                             │
-│   [7] Buka Dashboard ─────▶ AdminDashboardPage.jsx                         │
-│                                   │                                         │
-│                                   ▼                                         │
-│                            useData().transactions                           │
-│                                   │                                         │
-│   [8] Lihat Transaksi ◀───▶ Tabel dengan Avatar DiceBear                   │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+User Message → Fuzzy Search (Fuse.js) → Knowledge Base → Bot Response
 ```
-
----
-
-# 🌐 8. API Eksternal yang Digunakan
-
-## 8.1 DiceBear Avatar API
-
-| Aspek | Detail |
-|-------|--------|
-| **URL** | `https://api.dicebear.com/7.x/pixel-art/svg` |
-| **Method** | GET |
-| **Parameter** | `seed` (string) - Menentukan avatar yang dihasilkan |
-| **Response** | SVG Image |
-| **Contoh** | `https://api.dicebear.com/7.x/pixel-art/svg?seed=JohnDoe` |
-
-**Keunggulan:**
-- ✅ Deterministik (username sama = avatar sama)
-- ✅ Tidak perlu menyimpan gambar
-- ✅ Gratis tanpa limit
-
-## 8.2 GameSpot News API
-
-| Aspek | Detail |
-|-------|--------|
-| **URL** | `https://www.gamespot.com/api/articles/` |
-| **Method** | GET |
-| **Auth** | API Key via query parameter |
-| **Response** | JSON dengan daftar artikel |
-| **Digunakan di** | `NewsController.js` |
-
-## 8.3 Firebase (Optional)
-
-| Aspek | Detail |
-|-------|--------|
-| **SDK** | `firebase ^10.0.0` |
-| **Layanan** | Authentication, Realtime Database (opsional) |
-| **Status** | Tersedia sebagai alternatif autentikasi |
-
-## 8.4 CounterAPI — Statistik Transaksi Publik
-
-CounterAPI digunakan untuk menghitung dan menampilkan **jumlah total transaksi** yang telah berhasil diproses oleh sistem secara publik. API ini bersifat persistensi di cloud sehingga counter tidak reset meski server restart.
-
-### Informasi API
-
-| Aspek | Detail |
-|-------|--------|
-| **Base URL** | `https://api.counterapi.dev/v1/` |
-| **Namespace** | `gamerzone_official` |
-| **Counter Name** | `topup-counter` |
-| **Method** | GET (baca), GET dengan `/up` (increment) |
-| **Response** | JSON `{ "count": <number> }` |
-
-### Endpoint yang Digunakan
-
-| Endpoint | Fungsi | Digunakan di |
-|----------|--------|--------------|
-| `GET /v1/gamerzone_official/topup-counter/` | Mengambil nilai counter saat ini | `LiveStats.jsx`, `AdminOverview.jsx` |
-| `GET /v1/gamerzone_official/topup-counter/up` | Menambah counter +1 | `TopUpPage.jsx` (saat pembayaran sukses) |
-
-### Implementasi dalam Kode
-
-#### 1️⃣ Fetch Counter (LiveStats.jsx)
-
-```javascript
-// Mengambil jumlah transaksi untuk ditampilkan
-useEffect(() => {
-  fetch('https://api.counterapi.dev/v1/gamerzone_official/topup-counter/')
-    .then(res => res.json())
-    .then(data => {
-      if (data && typeof data.count === 'number') {
-        setCount(data.count);
-      }
-    })
-    .catch(err => {
-      // Fallback ke localStorage jika API gagal
-      const localTransactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-      setCount(localTransactions.length > 0 ? localTransactions.length : 1250);
-    });
-}, []);
-```
-
-#### 2️⃣ Increment Counter (TopUpPage.jsx)
-
-```javascript
-// Fire-and-forget increment setelah transaksi berhasil
-fetch('https://api.counterapi.dev/v1/gamerzone_official/topup-counter/up')
-  .then(res => res.json())
-  .then(data => console.log('CounterAPI Increment:', data))
-  .catch(err => console.error('CounterAPI Error:', err));
-```
-
-### Diagram Integrasi CounterAPI
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         COUNTERAPI INTEGRATION FLOW                         │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   👤 USER                                                                   │
-│      │                                                                      │
-│      ▼                                                                      │
-│   [TopUpPage.jsx]                                                          │
-│      │                                                                      │
-│      │ ─── Klik "BAYAR" ──▶ handlePay()                                    │
-│      │                           │                                          │
-│      │                           ▼                                          │
-│      │                    addTransaction() ✅                               │
-│      │                           │                                          │
-│      │                           ▼                                          │
-│      │            ┌───────────────────────────────┐                        │
-│      │            │  🌐 CounterAPI                │                        │
-│      │            │  GET .../topup-counter/up     │                        │
-│      │            │  Response: { count: 1251 }    │                        │
-│      │            └───────────────────────────────┘                        │
-│      │                                                                      │
-│   ════════════════════════════════════════════════════════════════════     │
-│                                                                             │
-│   🌍 PUBLIC VIEW (LiveStats.jsx)                                           │
-│      │                                                                      │
-│      ▼                                                                      │
-│   ┌───────────────────────────────┐                                        │
-│   │  🌐 CounterAPI                │                                        │
-│   │  GET .../topup-counter/       │                                        │
-│   │  Response: { count: 1251 }    │                                        │
-│   └───────────────────────────────┘                                        │
-│      │                                                                      │
-│      ▼                                                                      │
-│   ┌───────────────────────────────────────────┐                            │
-│   │  "1,251 Transactions Successfully        │                            │
-│   │   Processed!"                            │                            │
-│   └───────────────────────────────────────────┘                            │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Keunggulan CounterAPI
-
-| Fitur | Penjelasan |
-|-------|------------|
-| ✅ **Gratis** | Tidak memerlukan API key atau registrasi |
-| ✅ **Persisten** | Data tersimpan di cloud, tidak hilang saat restart server |
-| ✅ **Publik** | Counter dapat dilihat oleh siapa saja dengan URL yang sama |
-| ✅ **Fire-and-Forget** | Increment tidak memblokir alur utama transaksi |
-| ✅ **Fallback Ready** | Jika API gagal, frontend fallback ke localStorage |
-
----
-
-# ✨ 9. Kesimpulan
-
-<div align="center">
-
-## 📊 Ringkasan Teknologi GamerZone TopUp
-
-</div>
-
-### Total Teknologi yang Digunakan
-
-| Kategori | Jumlah | Daftar Utama |
-|----------|--------|--------------|
-| **Frontend Core** | 4 | React, Vite, Tailwind CSS, React Router |
-| **UI/Animation** | 4 | Framer Motion, Three.js, Lucide, Classnames |
-| **Backend Core** | 4 | Express, Mongoose, gRPC, Dotenv |
-| **Database** | 2 | MongoDB, MongoDB Memory Server |
-| **External APIs** | 4 | DiceBear, GameSpot, Firebase, **CounterAPI** |
-| **Dev Tools** | 4 | ESLint, PostCSS, Autoprefixer, TypeScript Defs |
-
-### Keunggulan Arsitektur
 
 | Fitur | Implementasi |
 |-------|--------------|
-| **🔄 Real-time Sync** | DataContext sebagai Single Source of Truth |
-| **💾 Dual Persistence** | MongoDB + JSON File fallback |
-| **🔥 Hot Reload** | Vite dengan Fast Refresh |
-| **🎨 Design System** | Tailwind dengan custom cyber colors |
-| **📱 Responsive** | Mobile-first dengan Tailwind utilities |
-| **🚀 Performance** | React Query caching + optimistic updates |
+| **Typo Tolerance** | threshold: 0.4 |
+| **Knowledge Base** | JSON file (`bot_knowledge.json`) |
+| **Fallback** | Human admin escalation |
 
 ---
 
-<div align="center">
+## 📊 Arsitektur Diagram
 
-*Dokumen ini disiapkan untuk keperluan evaluasi teknis dan presentasi proyek akhir.*
-
-**© 2024 GamerZone Development Team**
+```mermaid
+graph TB
+    subgraph Frontend
+        A[React + Vite] --> B[TailwindCSS]
+        A --> C[Three.js / React Three Fiber]
+        A --> D[Framer Motion]
+    end
+    
+    subgraph Backend
+        E[Express Gateway<br/>:3002] --> F[gRPC Server<br/>:50051]
+        F --> G[(MongoDB)]
+        F --> H[Smart Bot<br/>Fuse.js]
+    end
+    
+    subgraph External
+        I[GameSpot API]
+    end
+    
+    A -->|HTTP/REST| E
+    E -->|News API| I
+```
 
 ---
 
-**📞 Kontak Tim:**  
-Frontend Developer | Backend Developer | UI/UX Designer
+## 🌐 External API Integrations & Core Utilities
 
-</div>
-]]>
+Aplikasi GamerZone mengintegrasikan beberapa layanan API eksternal dan utility untuk memperkaya fitur dan fungsionalitas:
+
+| API Service | Kegunaan & Alasan Penggunaan (Detail) | Implementasi Teknis |
+|-------------|--------------------------------------|----------------------|
+| **GameSpot API** | **Engagement Berita:** Menyediakan konten berita gaming terbaru secara otomatis. Alasan: Meningkatkan waktu retensi pengguna dengan memberikan nilai tambah berupa informasi industri game tanpa perlu input manual. | `NewsController.js` |
+| **DiceBear Avatars** | **Personalitas Tanpa Privasi:** Menghasilkan avatar unik untuk setiap user secara deterministik berdasarkan username. Alasan: Memberikan elemen visual personal tanpa risiko privasi (tidak perlu upload foto asli) dan menghemat bandwidth storage. | `DataContext.jsx` / `Avatar.jsx` |
+| **CounterAPI** | **Social Proof & Kepercayaan:** Menghitung total transaksi secara publik di cloud. Alasan: Memperlihatkan bahwa sistem aktif dan banyak digunakan (membangun kepercayaan pembeli baru) dengan sinkronisasi antar sesi. | `LiveStats.jsx` / `TopUpPage.jsx` |
+| **Firebase SDK** | **Prototyping & Skalabilitas:** Digunakan sebagai opsi autentikasi dan database real-time. Alasan: Memudahkan pengembangan fitur sosial di masa depan dan menyediakan infrastruktur cloud yang handal tanpa setup server manual. | `AuthContext.jsx` (Optional) |
+| **Supabase JS** | **Manajemen Data Modern:** Alternatif backend-as-a-service untuk PostgreSQL dan Storage. Alasan: Memberikan fleksibilitas arsitektur jika proyek membutuhkan relasional database atau penyimpanan file cloud yang terintegrasi. | `client` integration (Optional) |
+| **Fuse.js** | **Typo-Tolerance Search:** Library fuzzy search yang ringan. Alasan: Memungkinkan Smart Bot memahami pesan pengguna meskipun ada kesalahan pengetikan (typo), meningkatkan pengalaman interaksi AI yang lebih 'manusiawi'. | `SmartBot Logic` |
+
+---
+
+## 📂 Struktur Direktori & Analisis Manfaat
+
+Berikut adalah rincian fungsionalitas detail dan alasan arsitektural dari direktori utama:
+
+### 📁 Root Directory
+- `ALL code/`: Wadah utama seluruh ekosistem aplikasi (Monorepo-style).
+- `Laporan_Teknis_GamerZone.md`: Sumber dokumentasi terpusat untuk audit dan pengembangan lanjutan.
+
+### 📁 Backend Layer (`/backend`)
+- `config/`: **Modularitas Konfigurasi.** Memisahkan detail infrastruktur (DB URL, Port) dari logika kode agar aplikasi mudah dipindahkan ke environment berbeda (Prod/Dev).
+- `controllers/`: **Separation of Concerns (SoC).** Tempat utama logika bisnis. Mengisolasi cara data diproses dari cara data diterima (Routes), sehingga memudahkan debugging unit logic.
+    - `LocalGamesController.js`: Menangani transaksi atomik dan manajemen stok/produk lokal.
+    - `NewsController.js`: Bertindak sebagai proxy antara server lokal dan API GameSpot untuk keamanan API Key.
+- `data/`: **Data Persistence Fallback.** Menggunakan JSON sebagai database kedua. Manfaat: Aplikasi tetap bisa berjalan (High Availability) jika koneksi MongoDB mengalami gangguan atau saat proses development cepat.
+- `models/`: **Integritas Data.** Menggunakan Mongoose untuk validasi skema. Menjamin setiap dokumen (Game/User) memiliki struktur yang konsisten sebelum masuk ke database.
+- `chat.proto`: **Kontrak Komunikasi.** Mendefinisikan pesan gRPC secara kaku agar frontend dan backend memiliki 'bahasa' yang sama secara efisien.
+- `gateway.js`: **API Gateway.** Titik masuk tunggal untuk semua request HTTP, menyederhanakan manajemen security dan monitoring.
+
+### 📁 Frontend Layer (`/frontend`)
+- `src/`: Core logic aplikasi client-side.
+    - `api/`: **Unified Communication.** Membungkus Axios dan gRPC Client. Manfaat: Jika endpoint berubah, developer hanya perlu mengubah satu file di sini.
+    - `components/common/`: **Reusability.** Komponen UI kecil (Button, Input) yang digunakan berulang kali untuk menjaga konsistensi visual (Atomic Design).
+    - `context/`: **Global State Management.** Mencegah *Prop Drilling*. Memungkinkan data User atau Game diakses di halaman mana pun tanpa harus dilempar lewat banyak komponen.
+    - `hooks/`: **Logic Extraction.** Memisahkan logika UI (misal: fetching data, hitung mundur) dari tampilan JSX agar kode lebih bersih dan bisa digunakan ulang di komponen lain.
+    - `pages/`: **View Management.** Mengelompokkan komponen menjadi satu tampilan halaman utuh yang terintegrasi dengan Router.
+- `tailwind.config.js`: **Design System.** Mengunci palet warna 'Cyberpunk' dan tipografi proyek agar seluruh developer mengikuti standar estetika yang sama.
+
+---
+
+## 🚀 Port Configuration
+
+| Service | Port | Protocol |
+|---------|------|----------|
+| **Frontend (Vite)** | 5173 | HTTP |
+| **Express Gateway** | 3002 | HTTP/REST |
+| **gRPC Server** | 50051 | gRPC (HTTP/2) |
+| **MongoDB** | 27017 | MongoDB Protocol |
+
+---
+
+## 📝 Kesimpulan
+
+| Kategori | Teknologi Utama |
+|----------|-----------------|
+| **Languages** | JavaScript (ES6+), Protocol Buffers |
+| **Frontend** | React 18, Vite, TailwindCSS, Three.js |
+| **Backend** | Node.js, Express.js, gRPC |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Real-time** | gRPC Streaming |
+| **AI/Bot** | Fuse.js fuzzy search |
+| **Animation** | Framer Motion, React Three Fiber |
+| **External APIs**| GameSpot, DiceBear, CounterAPI |

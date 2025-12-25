@@ -1,7 +1,6 @@
 import GameCard from './GameCard';
 import GameStoreCard from './GameStoreCard';
 import { useData } from '../context/DataContext'; // Updated to use Context
-import './GameGrid.css';
 
 const GameGrid = ({ activeTab = 'TOPUP' }) => {
   const { games } = useData();

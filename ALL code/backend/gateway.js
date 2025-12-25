@@ -17,7 +17,6 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 
 // Controllers
-import * as TransactionController from './controllers/TransactionController.js';
 import * as NewsController from './controllers/NewsController.js';
 import * as GamesController from './controllers/GamesController.js';
 

@@ -185,5 +185,33 @@
     "date": "2025-12-25",
     "timestamp": "2025-12-25T12:44:17.121Z",
     "paymentMethod": "GoPay"
+  },
+  {
+    "id": "TRX-1766675833667",
+    "userId": "123",
+    "username": "123",
+    "avatar": "https://api.dicebear.com/7.x/pixel-art/svg?seed=123",
+    "game": "Mobile Legends",
+    "gameType": "TOPUP",
+    "item": "86 Diamonds",
+    "amount": 20000,
+    "status": "Success",
+    "date": "2025-12-25",
+    "timestamp": "2025-12-25T15:17:13.693Z",
+    "paymentMethod": "GoPay"
+  },
+  {
+    "id": "TRX-1766676940816",
+    "userId": "123",
+    "username": "123",
+    "avatar": "https://api.dicebear.com/7.x/pixel-art/svg?seed=123",
+    "game": "Valorant",
+    "gameType": "TOPUP",
+    "item": "475 VP",
+    "amount": 50000,
+    "status": "Success",
+    "date": "2025-12-25",
+    "timestamp": "2025-12-25T15:35:40.816Z",
+    "paymentMethod": "GoPay"
   }
 ]
