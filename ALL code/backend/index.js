@@ -87,10 +87,20 @@ function joinChat(call) {
     });
   }
 
-  call.on('end', () => {
+  const cleanup = () => {
     if (user.role === 'ADMIN') admins.delete(user.id);
     else users.delete(user.id);
     console.log(`User disconnected: ${user.username}`);
+  };
+
+  call.on('end', cleanup);
+  call.on('error', (err) => {
+    console.error(`gRPC Error for ${user.username}:`, err.message);
+    cleanup();
+  });
+  call.on('cancelled', () => {
+    console.log(`gRPC Connection cancelled for ${user.username}`);
+    cleanup();
   });
 }
 

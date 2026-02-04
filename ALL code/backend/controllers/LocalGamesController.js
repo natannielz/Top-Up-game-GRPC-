@@ -1,3 +1,5 @@
+import Game from '../models/Game.js';
+import Transaction from '../models/Transaction.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -5,46 +7,45 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Define paths to JSON files
-const GAMES_FILE = path.join(__dirname, '../data/games.json');
-const TRANSACTIONS_FILE = path.join(__dirname, '../data/transactions.json');
+const GAMES_JSON = path.join(__dirname, '../data/games.json');
+const TRANSACTIONS_JSON = path.join(__dirname, '../data/transactions.json');
 
-// --- HELPER FUNCTIONS ---
-
-const readData = (filePath) => {
+// --- MIGRATION HELPER (Runs once if DB is empty) ---
+const seedDataIfEmpty = async () => {
   try {
-    if (!fs.existsSync(filePath)) {
-      // Create empty file if not exists
-      fs.writeFileSync(filePath, JSON.stringify([], null, 2));
-      return [];
+    const gameCount = await Game.countDocuments();
+    if (gameCount === 0 && fs.existsSync(GAMES_JSON)) {
+      console.log('[Migration] Seeding Games from JSON...');
+      const games = JSON.parse(fs.readFileSync(GAMES_JSON, 'utf8'));
+      if (games.length > 0) {
+        // Map _id to id if necessary or let Mongoose handle it
+        await Game.insertMany(games.map(g => ({ ...g, _id: undefined })));
+      }
     }
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data || '[]');
+
+    const txCount = await Transaction.countDocuments();
+    if (txCount === 0 && fs.existsSync(TRANSACTIONS_JSON)) {
+      console.log('[Migration] Seeding Transactions from JSON...');
+      const txs = JSON.parse(fs.readFileSync(TRANSACTIONS_JSON, 'utf8'));
+      if (txs.length > 0) {
+        await Transaction.insertMany(txs.map(t => ({ ...t, _id: undefined })));
+      }
+    }
   } catch (error) {
-    console.error(`Error reading ${filePath}:`, error);
-    return [];
+    console.error('[Migration] Error seeding data:', error);
   }
 };
 
-const writeData = (filePath, data) => {
-  try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    return true;
-  } catch (error) {
-    console.error(`Error writing to ${filePath}:`, error);
-    return false;
-  }
-};
+// Start seeding process
+seedDataIfEmpty();
 
 // --- CONTROLLER FUNCTIONS ---
 
 // Get all local games
 export const getLocalGames = async (req, res) => {
   try {
-    const games = readData(GAMES_FILE);
-    // Filter out deleted games if you want soft delete logic, or just return all active
-    const activeGames = games.filter(g => g.status !== 'Deleted');
-    res.status(200).json(activeGames);
+    const games = await Game.find({ status: { $ne: 'Deleted' } }).lean();
+    res.status(200).json(games);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -53,9 +54,7 @@ export const getLocalGames = async (req, res) => {
 // Get all transactions
 export const getTransactions = async (req, res) => {
   try {
-    const transactions = readData(TRANSACTIONS_FILE);
-    // Sort by date desc (newest first)
-    transactions.sort((a, b) => new Date(b.date || b.updatedAt) - new Date(a.date || a.updatedAt));
+    const transactions = await Transaction.find().sort({ createdAt: -1 }).lean();
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -65,21 +64,11 @@ export const getTransactions = async (req, res) => {
 // Create a new game
 export const createGame = async (req, res) => {
   try {
-    const games = readData(GAMES_FILE);
-
-    // Create new game object with ID
-    const newId = `game-${Date.now()}`;
-    const newGame = {
+    const newGame = new Game({
       ...req.body,
-      id: newId,
-      _id: newId, // Maintain compatibility with frontend checking _id
-      status: 'Active',
-      createdAt: new Date().toISOString()
-    };
-
-    games.push(newGame);
-    writeData(GAMES_FILE, games);
-
+      status: 'Active'
+    });
+    await newGame.save();
     res.status(201).json(newGame);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -90,24 +79,11 @@ export const createGame = async (req, res) => {
 export const updateGame = async (req, res) => {
   try {
     const { id } = req.params;
-    const games = readData(GAMES_FILE);
+    const updatedGame = await Game.findByIdAndUpdate(id, req.body, { new: true });
 
-    // Find index (check both id and _id)
-    const index = games.findIndex(g => g.id === id || g._id === id);
-
-    if (index === -1) {
+    if (!updatedGame) {
       return res.status(404).json({ message: 'Game not found' });
     }
-
-    // Update fields
-    const updatedGame = {
-      ...games[index],
-      ...req.body,
-      updatedAt: new Date().toISOString()
-    };
-
-    games[index] = updatedGame;
-    writeData(GAMES_FILE, games);
 
     res.status(200).json(updatedGame);
   } catch (error) {
@@ -119,54 +95,32 @@ export const updateGame = async (req, res) => {
 export const deleteGame = async (req, res) => {
   try {
     const { id } = req.params;
-    let games = readData(GAMES_FILE);
+    const deletedGame = await Game.findByIdAndDelete(id);
 
-    // Filter out the game to hard delete, OR set status to Deleted for soft delete
-    // Let's do hard delete for simplicity in JSON file to keep it clean, 
-    // OR soft delete to match previous logic. Let's do Hard Delete for file cleanup.
-    const newGames = games.filter(g => g.id !== id && g._id !== id);
-
-    if (newGames.length === games.length) {
+    if (!deletedGame) {
       return res.status(404).json({ message: 'Game not found' });
     }
 
-    writeData(GAMES_FILE, newGames);
     res.status(200).json({ message: 'Game deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Update transaction status (and persist it)
+// Update transaction status
 export const updateTransactionStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
     console.log(`[Admin] Updating Transaction ${id} to ${status}`);
 
-    const transactions = readData(TRANSACTIONS_FILE);
-    const index = transactions.findIndex(t => t.id === id);
+    const updatedTx = await Transaction.findOneAndUpdate(
+      { id: id },
+      { $set: { status: status, note: "Updated by admin" } },
+      { new: true, upsert: true }
+    );
 
-    let updatedTx;
-    if (index !== -1) {
-      // Update existing
-      transactions[index].status = status;
-      transactions[index].updatedAt = new Date().toISOString();
-      updatedTx = transactions[index];
-    } else {
-      // If mock transaction from frontend doesn't exist in file yet, create it
-      updatedTx = {
-        id,
-        status,
-        updatedAt: new Date().toISOString(),
-        note: "Auto-created from status update"
-      };
-      transactions.push(updatedTx);
-    }
-
-    writeData(TRANSACTIONS_FILE, transactions);
-
-    res.status(200).json({ success: true, id, status });
+    res.status(200).json({ success: true, id, status: updatedTx.status });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -177,32 +131,25 @@ export const createTransaction = async (req, res) => {
   try {
     const { userId, game, item, amount, paymentMethod, username } = req.body;
 
-    // Generate distinct ID
     const trxId = `TRX-${Date.now()}`;
-
-    // Generate Consistent Avatar (DiceBear Pixel Art)
     const safeUsername = username || userId || 'Guest';
     const avatarUrl = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(safeUsername)}`;
 
-    const newTransaction = {
+    const newTransaction = new Transaction({
       id: trxId,
       userId: userId || 'guest',
       username: safeUsername,
-      avatar: avatarUrl, // Persist avatar
+      avatar: avatarUrl,
       game: game || 'Unknown Game',
-      gameType: 'TOPUP', // Default
+      gameType: 'TOPUP',
       item: item || 'Unknown Item',
       amount: Number(amount) || 0,
-      status: 'Success', // User requested automatic success
-      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
-      timestamp: new Date().toISOString(),
+      status: 'Success', // For production, this should probably be Pending until payment confirmed
+      date: new Date().toISOString().split('T')[0],
       paymentMethod: paymentMethod || 'Unknown'
-    };
+    });
 
-    const transactions = readData(TRANSACTIONS_FILE);
-    transactions.push(newTransaction);
-    writeData(TRANSACTIONS_FILE, transactions);
-
+    await newTransaction.save();
     console.log(`[Transaction] Created ${trxId} for ${safeUsername}`);
 
     res.status(201).json({
@@ -216,3 +163,4 @@ export const createTransaction = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
