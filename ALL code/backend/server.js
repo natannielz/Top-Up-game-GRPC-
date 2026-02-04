@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 console.log('[Orchestrator] Starting GamerZone Backend Services...');
 
 // 1. Start gRPC Server (Chat & Real-time)
-const grpcProcess = spawn('node', [path.join(__dirname, 'index.js')], {
+const grpcProcess = spawn('node', [`"${path.join(__dirname, 'index.js')}"`], {
   stdio: 'inherit',
   shell: true
 });
@@ -21,7 +21,7 @@ grpcProcess.on('error', (err) => {
 });
 
 // 2. Start Express Gateway (HTTP API)
-const gatewayProcess = spawn('node', [path.join(__dirname, 'gateway.js')], {
+const gatewayProcess = spawn('node', [`"${path.join(__dirname, 'gateway.js')}"`], {
   stdio: 'inherit',
   shell: true
 });

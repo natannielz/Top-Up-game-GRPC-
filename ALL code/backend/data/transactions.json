@@ -213,5 +213,19 @@
     "date": "2025-12-25",
     "timestamp": "2025-12-25T15:35:40.816Z",
     "paymentMethod": "GoPay"
+  },
+  {
+    "id": "TRX-1770180146457",
+    "userId": "42131324",
+    "username": "Player_1324",
+    "avatar": "https://api.dicebear.com/7.x/pixel-art/svg?seed=Player_1324",
+    "game": "Mobile Legends",
+    "gameType": "TOPUP",
+    "item": "1000 Diamonds",
+    "amount": 180000,
+    "status": "Success",
+    "date": "2026-02-04",
+    "timestamp": "2026-02-04T04:42:26.457Z",
+    "paymentMethod": "QRIS All Payment"
   }
 ]

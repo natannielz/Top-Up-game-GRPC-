@@ -10,6 +10,9 @@ console.log('[Gateway] Key Preview:', process.env.GAMESPOT_API_KEY ? process.env
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 
@@ -24,14 +27,36 @@ import * as GamesController from './controllers/GamesController.js';
 import * as LocalGamesController from './controllers/LocalGamesController.js';
 
 import * as SystemController from './controllers/SystemController.js';
+import * as AuthController from './controllers/AuthController.js';
+import { protect, admin } from './middleware/authMiddleware.js';
+import User from './models/User.js';
 
 const app = express();
 const PORT = 3002;
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(async () => {
+  // Seed initial Admin if no users exist
+  const userCount = await User.countDocuments();
+  if (userCount === 0) {
+    console.log('[Auth] Seeding initial admin user...');
+    await User.create({
+      username: 'admin',
+      email: 'admin@gamerzone.com',
+      password: 'password123',
+      role: 'ADMIN',
+      status: 'Active'
+    });
+    console.log('[Auth] Admin seeded: admin / password123');
+  }
+});
 
 // Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable for easier dev/test if needed
+}));
+app.use(compression());
+app.use(morgan('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -137,17 +162,22 @@ app.get('/api/catalog/game/:id', GamesController.getGameById); // Single Game De
 
 
 
+// --- AUTH ROUTES ---
+app.post('/api/auth/register', AuthController.registerUser);
+app.post('/api/auth/login', AuthController.authUser);
+app.get('/api/auth/profile', protect, AuthController.getUserProfile);
+
 // --- NEW ADMIN CRUD ROUTES (Local DB) ---
 
 // Game Management
-app.get('/api/admin/games', LocalGamesController.getLocalGames);
-app.post('/api/admin/games', LocalGamesController.createGame);
-app.put('/api/admin/games/:id', LocalGamesController.updateGame);
-app.delete('/api/admin/games/:id', LocalGamesController.deleteGame);
+app.get('/api/admin/games', protect, admin, LocalGamesController.getLocalGames);
+app.post('/api/admin/games', protect, admin, LocalGamesController.createGame);
+app.put('/api/admin/games/:id', protect, admin, LocalGamesController.updateGame);
+app.delete('/api/admin/games/:id', protect, admin, LocalGamesController.deleteGame);
 
 // Transaction Management (Fix for Admin)
-app.get('/api/admin/transactions', LocalGamesController.getTransactions); // NEW: Fetch transactions
-app.put('/api/admin/transactions/:id/status', LocalGamesController.updateTransactionStatus);
+app.get('/api/admin/transactions', protect, admin, LocalGamesController.getTransactions); // NEW: Fetch transactions
+app.put('/api/admin/transactions/:id/status', protect, admin, LocalGamesController.updateTransactionStatus);
 
 
 

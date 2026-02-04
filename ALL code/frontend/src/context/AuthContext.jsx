@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axios';
 
 const AuthContext = createContext();
 
@@ -7,181 +8,77 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
 
-  // Initialize with seed data if empty
   useEffect(() => {
     const initAuth = async () => {
-      // Load local "database" of users
-      const savedUsers = localStorage.getItem('users');
-      if (savedUsers) {
-        setUsers(JSON.parse(savedUsers));
-      } else {
-        const seedUsers = [
-          {
-            id: '1',
-            username: 'admin1',
-            email: 'admin@gamerzone.com',
-            password: 'password123',
-            role: 'ADMIN',
-            status: 'Active',
-            avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin1&backgroundColor=b6e3f4,c0aede,d1d4f9'
-          },
-          {
-            id: '2',
-            username: 'user1',
-            email: 'user1@example.com',
-            password: 'password123',
-            role: 'USER',
-            status: 'Active',
-            avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=user1&backgroundColor=b6e3f4,c0aede,d1d4f9'
-          }
-        ];
-        setUsers(seedUsers);
-        localStorage.setItem('users', JSON.stringify(seedUsers));
-      }
-
-      // Check for active session from LocalStorage
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
-        setUser(JSON.parse(savedUser));
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+          // Optional: Verify token with profile call
+          const { data } = await api.get('/auth/profile');
+          setUser({ ...parsedUser, ...data });
+        } catch (err) {
+          console.error("Token verification failed:", err);
+          localStorage.removeItem('currentUser');
+          setUser(null);
+        }
       }
-
       setLoading(false);
     };
 
     initAuth();
   }, []);
 
-  // Sync users to localStorage
-  useEffect(() => {
-    if (users.length > 0) {
-      localStorage.setItem('users', JSON.stringify(users));
-    }
-  }, [users]);
-
-  // --- MANUAL AUTH (Keep for Admin/Mock) ---
-  const login = (username, password) => {
-    const foundUser = users.find(u => (u.username === username || u.email === username) && u.password === password);
-    if (foundUser) {
-      if (foundUser.status === 'Banned') throw new Error('Account is BANNED. Contact support.');
-      if (foundUser.status === 'Pending') throw new Error('Account is PENDING approval by Admin.');
-
-      setUser(foundUser);
-      localStorage.setItem('currentUser', JSON.stringify(foundUser));
-      return foundUser;
-    } else {
-      throw new Error('Access Denied: Invalid Credentials');
+  const login = async (username, password) => {
+    try {
+      const { data } = await api.post('/auth/login', { username, password });
+      setUser(data);
+      localStorage.setItem('currentUser', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
 
-  const register = (username, email, password) => {
-    if (users.find(u => u.username === username || u.email === email)) {
-      throw new Error('Username or Email already exists');
+  const register = async (username, email, password) => {
+    try {
+      const { data } = await api.post('/auth/register', { username, email, password });
+      // Depending on workflow, you might auto-login or wait for approval
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
-
-    const newUser = {
-      id: Date.now().toString(),
-      username,
-      email,
-      password, // In a real app, hash this!
-      role: 'USER',
-      status: 'Pending', // New users need approval
-      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}&backgroundColor=b6e3f4,c0aede,d1d4f9`,
-      points: 0,
-      rank: 'Bronze'
-    };
-
-    setUsers([...users, newUser]);
-    return newUser;
-  };
-
-  // --- MOCK SOCIAL LOGIN (Replaced Supabase) ---
-  const loginWithGoogle = async () => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Mock successful Google Login
-    const mockGoogleUser = {
-      id: 'google-' + Date.now(),
-      username: 'Google User',
-      email: 'user@gmail.com',
-      role: 'USER',
-      status: 'Active',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=google&backgroundColor=b6e3f4,c0aede,d1d4f9',
-      points: 100,
-      rank: 'Bronze'
-    };
-
-    setUser(mockGoogleUser);
-    localStorage.setItem('currentUser', JSON.stringify(mockGoogleUser));
-    return { user: mockGoogleUser };
-  };
-
-  const loginWithFacebook = async () => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Mock successful Facebook Login
-    const mockFBUser = {
-      id: 'fb-' + Date.now(),
-      username: 'Facebook User',
-      email: 'user@facebook.com',
-      role: 'USER',
-      status: 'Active',
-      avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=facebook&backgroundColor=b6e3f4,c0aede,d1d4f9',
-      points: 100,
-      rank: 'Bronze'
-    };
-
-    setUser(mockFBUser);
-    localStorage.setItem('currentUser', JSON.stringify(mockFBUser));
-    return { user: mockFBUser };
   };
 
   const logout = async () => {
-    // await supabase.auth.signOut(); // Removed
     setUser(null);
     localStorage.removeItem('currentUser');
   };
 
-  // --- ADMIN UTILS ---
-  const updateUserStatus = (userId, newStatus) => {
-    setUsers(users.map(u => u.id === userId ? { ...u, status: newStatus } : u));
-  };
-
-  const updateProfile = (updates) => {
-    if (!user) return;
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    setUsers(users.map(u => u.id === user.id ? updatedUser : u));
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-  };
-
-  const deleteAccount = () => {
-    if (!user) return;
-    setUsers(users.filter(u => u.id !== user.id));
-    logout();
-  };
-
-  const deleteUser = (userId) => {
-    setUsers(users.filter(u => u.id !== userId));
+  const updateProfile = async (updates) => {
+    try {
+      // In real app, you would have a PUT /api/auth/profile
+      // For now, let's keep it local or implement if needed
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      loading, // Exposed
-      users,
+      loading,
       login,
       logout,
       register,
-      loginWithGoogle,
-      loginWithFacebook,
-      updateUserStatus,
       updateProfile,
-      deleteAccount,
-      deleteUser
+      loginWithGoogle: () => { throw new Error('Switch to real Google Auth requested') },
+      loginWithFacebook: () => { throw new Error('Switch to real Facebook Auth requested') }
     }}>
       {children}
     </AuthContext.Provider>
